@@ -2,16 +2,19 @@
 
 namespace App\DTOs;
 
+use App\Enums\UserRole;
+
 class UserDTO
 {
     public function __construct(
-        public int $id,
-        public string $name,
-        public string $email,
-        public string $role,
-        public ?string $profile_image = null,
-        public ?string $phone = null,
-        public string $created_at,
+        public readonly int $id,
+        public readonly string $name,
+        public readonly string $email,
+        public readonly UserRole $role,
+        public readonly ?string $profile_image,
+        public readonly ?string $phone,
+        public readonly string $created_at,
+        public readonly string $updated_at,
     ) {}
 
     public static function fromModel(\App\Models\User $user): self
@@ -20,10 +23,11 @@ class UserDTO
             id: $user->id,
             name: $user->name,
             email: $user->email,
-            role: $user->role->value,
+            role: $user->role,
             profile_image: $user->profile_image,
             phone: $user->phone,
-            created_at: $user->created_at->toDateTimeString(),
+            created_at: $user->created_at->toIso8601String(),
+            updated_at: $user->updated_at->toIso8601String(),
         );
     }
 
@@ -33,10 +37,12 @@ class UserDTO
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'role' => $this->role,
+            'role' => $this->role->value,
+            'role_label' => $this->role->label(),
             'profile_image' => $this->profile_image,
             'phone' => $this->phone,
             'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
