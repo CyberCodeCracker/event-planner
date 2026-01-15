@@ -19,14 +19,14 @@ class RegistrationService
     public function getRegistrationById(int $registrationId): ?RegistrationDTO
     {
         $registration = $this->registrationRepository->find($registrationId);
-        
+
         return $registration ? RegistrationDTO::fromModel($registration) : null;
     }
 
     public function registerUserToEvent(User $user, Event $event): RegistrationDTO
     {
         $registration = $this->registrationRepository->registerUserToEvent($user, $event);
-        
+
         return RegistrationDTO::fromModel($registration);
     }
 
@@ -38,25 +38,30 @@ class RegistrationService
     public function getUserRegistrations(User $user, array $filters = []): LengthAwarePaginator
     {
         $registrations = $this->registrationRepository->getUserRegistrations($user->id, $filters);
-        
+
         // Transform to DTOs
         $registrations->getCollection()->transform(function ($registration) {
             return RegistrationDTO::fromModel($registration);
         });
-        
+
         return $registrations;
     }
 
     public function getEventRegistrations(int $eventId): LengthAwarePaginator
     {
         $registrations = $this->registrationRepository->getEventRegistrations($eventId);
-        
+
         // Transform to DTOs
         $registrations->getCollection()->transform(function ($registration) {
             return RegistrationDTO::fromModel($registration);
         });
-        
+
         return $registrations;
+    }
+
+    public function unregisterById(int $registrationId): bool
+    {
+        return $this->registrationRepository->delete($registrationId);
     }
 
     public function checkIfUserIsRegistered(User $user, int $eventId): bool

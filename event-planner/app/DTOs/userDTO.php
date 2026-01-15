@@ -3,6 +3,7 @@
 namespace App\DTOs;
 
 use App\Enums\UserRole;
+use App\Models\User;
 
 class UserDTO
 {
@@ -17,7 +18,7 @@ class UserDTO
         public readonly string $updated_at,
     ) {}
 
-    public static function fromModel(\App\Models\User $user): self
+    public static function fromModel(User $user): self
     {
         return new self(
             id: $user->id,

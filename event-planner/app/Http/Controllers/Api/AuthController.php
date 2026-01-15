@@ -39,12 +39,14 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = $this->authService->register($request->validated());
+        // This now returns an array with 'user' and 'token'
+        $result = $this->authService->register($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Registration successful',
-            'user' => $user->toArray()
+            'user' => $result['user']->toArray(),  // Access the user from array
+            'token' => $result['token']             // Include the token
         ], 201);
     }
 
@@ -53,7 +55,14 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
-        $this->authService->logout();
+        $success = $this->authService->logout();
+
+        if (!$success) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Logout failed'
+            ], 400);
+        }
 
         return response()->json([
             'success' => true,

@@ -1,107 +1,185 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Controllers\Api;
 
-use App\Repositories\Contracts\RegistrationRepositoryInterface;
-use App\Repositories\Contracts\EventRepositoryInterface;
-use App\DTOs\RegistrationDTO;
-use App\Models\User;
+use Illuminate\Routing\Controller;
+use App\Services\RegistrationService;
+use App\Services\EventService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use App\Models\Event;
-use App\Models\Registration;
-use Illuminate\Pagination\LengthAwarePaginator;
 
-class RegistrationService
+class RegistrationController extends Controller
 {
     public function __construct(
-        protected RegistrationRepositoryInterface $registrationRepository,
-        protected EventRepositoryInterface $eventRepository
+        protected RegistrationService $registrationService,
+        protected EventService $eventService
     ) {}
 
     /**
-     * Get registration by ID
+     * Get user's registrations
      */
-    public function getRegistrationById(int $registrationId): ?RegistrationDTO
+    public function index(Request $request): JsonResponse
     {
-        $registration = $this->registrationRepository->find($registrationId);
-        
-        return $registration ? RegistrationDTO::fromModel($registration) : null;
-    }
+        $registrations = $this->registrationService->getUserRegistrations(
+            $request->user(),
+            $request->all()
+        );
 
-    /**
-     * Get registration by ID (returns Model)
-     */
-    public function getRegistrationModel(int $registrationId): ?Registration
-    {
-        return $this->registrationRepository->find($registrationId);
-    }
-
-    /**
-     * Unregister by registration ID
-     */
-    public function unregisterById(int $registrationId): bool
-    {
-        return $this->registrationRepository->delete($registrationId);
+        return response()->json([
+            'success' => true,
+            'data' => $registrations->items(),
+            'meta' => [
+                'current_page' => $registrations->currentPage(),
+                'last_page' => $registrations->lastPage(),
+                'per_page' => $registrations->perPage(),
+                'total' => $registrations->total(),
+            ]
+        ]);
     }
 
     /**
      * Register user to event
      */
-    public function registerUserToEvent(User $user, Event $event): RegistrationDTO
+    public function store(Request $request, Event $event): JsonResponse
     {
-        $registration = $this->registrationRepository->registerUserToEvent($user, $event);
+        // Check if user can register
+        $canRegister = $this->eventService->canRegisterToEvent($request->user(), $event);
         
-        return RegistrationDTO::fromModel($registration);
+        if (!$canRegister['can_register']) {
+            return response()->json([
+                'success' => false,
+                'message' => $canRegister['message']
+            ], 400);
+        }
+
+        try {
+            $registration = $this->registrationService->registerUserToEvent(
+                $request->user(), 
+                $event
+            );
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully registered for event',
+                'data' => $registration->toArray(),
+                'available_spots' => $canRegister['available_spots'] ?? null,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     /**
-     * Unregister user from event
+     * Cancel registration
      */
-    public function unregisterUserFromEvent(User $user, int $eventId): bool
+    public function destroy(Request $request, int $id): JsonResponse
     {
-        return $this->registrationRepository->unregisterUserFromEvent($user->id, $eventId);
+        try {
+            // Get registration
+            $registration = $this->registrationService->getRegistrationById($id);
+            
+            if (!$registration) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Registration not found'
+                ], 404);
+            }
+            
+            // Check if user owns this registration
+            if ($request->user()->id !== $registration->user_id && !$request->user()->isAdmin()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized to cancel this registration'
+                ], 403);
+            }
+            
+            // Check if event has already started
+            $event = Event::find($registration->event_id);
+            if ($event && $event->start_date < now()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot cancel registration for event that has already started'
+                ], 400);
+            }
+            
+            $this->registrationService->unregisterById($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration cancelled successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     /**
-     * Get user's registrations
+     * Unregister from event (alternative method using event ID)
      */
-    public function getUserRegistrations(User $user, array $filters = []): LengthAwarePaginator
+    public function unregister(Request $request, int $eventId): JsonResponse
     {
-        $registrations = $this->registrationRepository->getUserRegistrations($user->id, $filters);
-        
-        $registrations->getCollection()->transform(function ($registration) {
-            return RegistrationDTO::fromModel($registration);
-        });
-        
-        return $registrations;
-    }
-
-    /**
-     * Get event registrations
-     */
-    public function getEventRegistrations(int $eventId): LengthAwarePaginator
-    {
-        $registrations = $this->registrationRepository->getEventRegistrations($eventId);
-        
-        $registrations->getCollection()->transform(function ($registration) {
-            return RegistrationDTO::fromModel($registration);
-        });
-        
-        return $registrations;
+        try {
+            $this->registrationService->unregisterUserFromEvent($request->user(), $eventId);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully unregistered from event'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     /**
      * Check if user is registered for event
      */
-    public function checkIfUserIsRegistered(User $user, int $eventId): bool
+    public function check(Request $request, int $eventId): JsonResponse
     {
-        return $this->registrationRepository->findByUserAndEvent($user->id, $eventId) !== null;
+        $isRegistered = $this->registrationService->checkIfUserIsRegistered(
+            $request->user(), 
+            $eventId
+        );
+        
+        return response()->json([
+            'success' => true,
+            'is_registered' => $isRegistered,
+            'message' => $isRegistered ? 'User is registered for this event' : 'User is not registered'
+        ]);
     }
 
     /**
-     * Get registration count for event
+     * Get event registrations (admin only)
      */
-    public function getRegistrationCountForEvent(int $eventId): int
+    public function eventRegistrations(Request $request, int $eventId): JsonResponse
     {
-        return $this->registrationRepository->countRegistrationsForEvent($eventId);
+        if (!$request->user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $registrations = $this->registrationService->getEventRegistrations($eventId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $registrations->items(),
+            'meta' => [
+                'current_page' => $registrations->currentPage(),
+                'last_page' => $registrations->lastPage(),
+                'per_page' => $registrations->perPage(),
+                'total' => $registrations->total(),
+            ]
+        ]);
     }
 }

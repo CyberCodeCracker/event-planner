@@ -8,6 +8,8 @@ use App\Enums\UserRole;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AuthService
 {
@@ -18,43 +20,69 @@ class AuthService
     public function login(string $email, string $password): ?LoginResponseDTO
     {
         $user = $this->userRepository->findByEmail($email);
-        
+
         if (!$user || !Hash::check($password, $user->password)) {
             return null;
         }
 
-        // Login using Sanctum (will create session)
-        Auth::login($user);
-        
+        $token = $user->createToken('api-token')->plainTextToken;
+
         return new LoginResponseDTO(
-            user: UserDTO::fromModel($user)
+            user: UserDTO::fromModel($user),
+            token: $token,  
+            success: true,
+            message: 'Login successful'
         );
     }
 
-    public function register(array $data): UserDTO
+    public function register(array $data): array
     {
         $data['password'] = Hash::make($data['password']);
         $data['role'] = UserRole::USER->value;
-        
+
         $user = $this->userRepository->create($data);
         
-        // Auto-login after registration
-        Auth::login($user);
-        
-        return UserDTO::fromModel($user);
+        // Create token for auto-login after registration
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return [
+            'user' => UserDTO::fromModel($user),
+            'token' => $token
+        ];
     }
 
-    public function logout(): void
+    public function logout(): bool
     {
-        Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        try {
+            // Get the token from the Authorization header
+            $token = request()->bearerToken();
+            
+            if (!$token) {
+                return false;
+            }
+            
+            // Hash the token to match what's in the database
+            $hashedToken = hash('sha256', $token);
+            
+            // Delete the token from the database
+            $deleted = DB::table('personal_access_tokens')
+                ->where('token', $hashedToken)
+                ->delete();
+            
+            return $deleted > 0;
+            
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function getCurrentUser(): ?UserDTO
     {
-        $user = Auth::user();
+        if (!Auth::check()) {
+            return null;
+        }
         
+        $user = Auth::user();
         return $user ? UserDTO::fromModel($user) : null;
     }
 }

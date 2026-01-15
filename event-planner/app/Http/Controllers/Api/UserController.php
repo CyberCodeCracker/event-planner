@@ -12,13 +12,18 @@ class UserController extends Controller
 {
     public function __construct(
         protected UserService $userService
-    ) {}
+    ) {
+        $this->middleware('auth:sanctum');
+    }
 
     /**
      * Get all users (admin only)
      */
     public function index(Request $request): JsonResponse
     {
+        if($request->user() === null){
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
         // Check if user is admin
         if (!$request->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
