@@ -8,6 +8,9 @@ use App\Http\Requests\UpdateEventRequest;
 use App\Services\EventService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
+use Illuminate\Validation\Validator;
 
 class EventController extends Controller
 {
@@ -20,6 +23,9 @@ class EventController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        Log::info('=== INDEX METHOD HIT ===', [
+            'method' => $request->method(),
+        ]);
         $events = $this->eventService->getAllEvents(
             $request->all(),
             $request->user()
@@ -42,17 +48,51 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request): JsonResponse
     {
+        Log::info('=== EVENT STORE START ===');
+        Log::info('User:', ['id' => $request->user()->id, 'is_admin' => $request->user()->isAdmin()]);
+        Log::info('Request data:', $request->all());
+
         if (!$request->user()->isAdmin()) {
+            Log::warning('User not admin');
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $event = $this->eventService->createEvent($request->validated(), $request->user());
+        // Check validation
+        Log::info('Validating request...');
+        $validator = FacadesValidator::make($request->all(), (new StoreEventRequest())->rules());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Event created successfully',
-            'data' => $event->toArray()
-        ], 201);
+        if ($validator->fails()) {
+            Log::error('Validation failed:', $validator->errors()->toArray());
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        Log::info('Validation passed');
+        Log::info('Validated data:', $request->validated());
+
+        try {
+            $event = $this->eventService->createEvent($request->validated(), $request->user());
+
+            Log::info('Event created successfully:', ['event_id' => $event->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event created successfully',
+                'data' => $event->toArray()
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Event creation error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -60,6 +100,9 @@ class EventController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
+        Log::info('=== SHOW METHOD HIT ===', [
+            'method' => $request->method(),
+        ]);
         $event = $this->eventService->getEventById($id, $request->user());
 
         if (!$event) {
@@ -77,13 +120,16 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, int $id): JsonResponse
     {
+        Log::info('=== UPDATE METHOD HIT ===', [
+            'method' => $request->method(),
+        ]);
         if (!$request->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         try {
             $event = $this->eventService->updateEvent($id, $request->validated());
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Event updated successfully',
@@ -99,13 +145,16 @@ class EventController extends Controller
      */
     public function destroy(Request $request, int $id): JsonResponse
     {
+        Log::info('=== DESTROY METHOD HIT ===', [
+            'method' => $request->method(),
+        ]);
         if (!$request->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         try {
             $this->eventService->deleteEvent($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Event deleted successfully'

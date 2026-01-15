@@ -9,11 +9,6 @@ class Event extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'title',
         'description',
@@ -25,7 +20,7 @@ class Event extends Model
         'capacity',
         'image',
         'created_by',
-        'is_free',
+        'is_active',
     ];
 
     /**

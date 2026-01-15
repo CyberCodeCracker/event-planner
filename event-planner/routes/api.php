@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\RegistrationController;
-use Illuminate\Support\Facades\Log;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
@@ -41,59 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    Route::post('/debug-register', function (\Illuminate\Http\Request $request) {
-        try {
-            // Use \Log:: instead of Log::
-            Log::info('Debug register attempt', $request->all());
-
-            // Simple validation
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users',
-                'password' => 'required|min:8|confirmed',
-                'phone' => 'nullable|string'
-            ]);
-
-            Log::info('Validation passed', $validated);
-
-            // Create user directly
-            $user = \App\Models\User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
-                'phone' => $validated['phone'] ?? null,
-                'role' => \App\Enums\UserRole::USER->value
-            ]);
-
-            Log::info('User created', ['user_id' => $user->id]);
-
-            // Create token
-            $token = $user->createToken('api-token')->plainTextToken;
-
-            Log::info('Token created');
-
-            return response()->json([
-                'success' => true,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email
-                ],
-                'token' => $token
-            ], 201);
-        } catch (\Exception $e) {
-            dd('Debug register failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-    });
-
     // My registrations
     Route::get('/my-registrations', [RegistrationController::class, 'index']);
 
@@ -103,7 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin-only routes
     Route::middleware('admin')->group(function () {
-        // Events (admin CRUD)
+        // Events (admin CRUD)e
         Route::apiResource('events', EventController::class)->except(['index', 'show']);
 
         // Categories (admin CRUD)
