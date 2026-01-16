@@ -1,0 +1,116 @@
+<header class="bg-white shadow-sm border-b border-gray-200">
+  <nav class="container mx-auto px-4">
+    <div class="flex justify-between items-center py-4">
+      <!-- Logo -->
+      <div class="flex items-center space-x-8">
+        <a [routerLink]="['/']" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+          Event Planner
+        </a>
+        
+        <!-- Navigation Links -->
+        <div class="hidden md:flex items-center space-x-6">
+          <a [routerLink]="['/']" 
+             routerLinkActive="text-blue-600 font-semibold"
+             class="text-gray-600 hover:text-blue-600 transition-colors">
+            Home
+          </a>
+          <a [routerLink]="['/events']" 
+             routerLinkActive="text-blue-600 font-semibold"
+             class="text-gray-600 hover:text-blue-600 transition-colors">
+            Events
+          </a>
+          <a [routerLink]="['/categories']" 
+             routerLinkActive="text-blue-600 font-semibold"
+             class="text-gray-600 hover:text-blue-600 transition-colors">
+            Categories
+          </a>
+          
+          <!-- Admin Links -->
+          <ng-container *ngIf="isAdmin">
+            <a [routerLink]="['/admin/dashboard']" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors">
+              Dashboard
+            </a>
+            <a [routerLink]="['/admin/categories']" 
+               routerLinkActive="text-blue-600 font-semibold"
+               class="text-gray-600 hover:text-blue-600 transition-colors">
+              Manage Categories
+            </a>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Auth Section -->
+      <div class="flex items-center space-x-4">
+        <ng-container *ngIf="!currentUser; else userMenu">
+          <a [routerLink]="['/auth/register']" 
+             class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+            Sign Up
+          </a>
+          <a [routerLink]="['/auth/login']" 
+             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Sign In
+          </a>
+        </ng-container>
+
+        <ng-template #userMenu>
+          <div class="relative group">
+            <button class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <!-- User Avatar -->
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span class="text-blue-600 font-semibold text-sm">{{ userInitials }}</span>
+              </div>
+              
+              <!-- User Info -->
+              <div class="hidden md:block text-left">
+                <p class="font-medium text-gray-900">{{ currentUser?.name }}</p>
+                <p class="text-sm text-gray-500">{{ currentUser?.role_label }}</p>
+              </div>
+              
+              <!-- Dropdown Icon -->
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border py-2 z-50 invisible group-hover:visible">
+              <a [routerLink]="['/profile']" 
+                 class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                View Profile
+              </a>
+              <a [routerLink]="['/my-events']" 
+                 class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                My Events
+              </a>
+              <a [routerLink]="['/my-registrations']" 
+                 class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                My Registrations
+              </a>
+              
+              <!-- Admin Options -->
+              <ng-container *ngIf="isAdmin">
+                <div class="border-t my-2"></div>
+                <a [routerLink]="['/admin/events']" 
+                   class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                  Manage Events
+                </a>
+                <a [routerLink]="['/admin/users']" 
+                   class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                  Manage Users
+                </a>
+              </ng-container>
+              
+              <div class="border-t my-2"></div>
+              <button (click)="onLogout()" 
+                      class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                Logout
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </nav>
+</header>

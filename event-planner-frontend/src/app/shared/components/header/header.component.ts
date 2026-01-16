@@ -1,0 +1,44 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { User, UserRole } from '../../../core/models/user.model';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss']
+})
+export class HeaderComponent implements OnInit {
+  currentUser: User | null = null;
+  isAdmin = false;
+  userInitials = '';
+
+  constructor(
+    public authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      this.isAdmin = user?.role === UserRole.ADMIN;
+      
+      if (user) {
+        this.userInitials = user.name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase()
+          .substring(0, 2);
+      }
+    });
+  }
+
+  onLogout() {
+    this.authService.logout().subscribe();
+  }
+
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
+}
