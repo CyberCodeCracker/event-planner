@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { User, UserRole } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  imports: [RouterLink]
 })
 export class HeaderComponent implements OnInit {
   currentUser: User | null = null;
@@ -35,7 +36,17 @@ export class HeaderComponent implements OnInit {
   }
 
   onLogout() {
-    this.authService.logout().subscribe();
+    this.authService.logout().subscribe({
+      next: () => {
+        // Navigation is handled in the auth service
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+        // Even if logout fails on backend, clear local auth and navigate
+        this.authService.clearAuth();
+        this.router.navigate(['/auth/login']);
+      }
+    });
   }
 
   navigateTo(route: string) {

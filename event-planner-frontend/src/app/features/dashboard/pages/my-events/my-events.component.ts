@@ -46,7 +46,8 @@ import { Event } from '../../../../core/models/event.model';
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let event of events" class="hover:bg-gray-50">
+              @for (event of events; track event.id) {
+                <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4">
                   <div>
                     <div class="font-medium text-gray-900">{{ event.title }}</div>
@@ -68,10 +69,12 @@ import { Event } from '../../../../core/models/event.model';
                   <button class="text-blue-600 hover:text-blue-900 mr-4">Edit</button>
                   <button class="text-red-600 hover:text-red-900">Delete</button>
                 </td>
-              </tr>
+                </tr>
+              }
               
               <!-- Empty State -->
-              <tr *ngIf="events.length === 0">
+              @if (events.length === 0) {
+                <tr>
                 <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                   <div class="flex flex-col items-center">
                     <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +87,8 @@ import { Event } from '../../../../core/models/event.model';
                     </a>
                   </div>
                 </td>
-              </tr>
+                </tr>
+              }
             </tbody>
           </table>
         </div>

@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
-import { AdminGuard } from './core/guards/role.guard';
+import { AuthGuard } from './core/guard/auth.guard';
+import { AdminGuard } from './core/guard/role.guard';
 
 // Layouts
 import { PublicLayoutComponent } from './layouts/public-layout/public-layout.component';
@@ -44,6 +44,7 @@ export const routes: Routes = [
     component: PublicLayoutComponent,
     children: [
       { path: '', component: HomeComponent },
+      { path: 'events/:id', component: HomeComponent }, // Temporary - will show event details
       // Add more public routes here
     ]
   },

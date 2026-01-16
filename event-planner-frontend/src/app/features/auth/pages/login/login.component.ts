@@ -1,13 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LoginRequest } from '../../../../core/models/auth.model';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  imports: [RouterLink, ReactiveFormsModule],
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
@@ -24,14 +30,14 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      remember: [false]
+      remember: [false],
     });
   }
 
   ngOnInit() {
     // Get return URL from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    
+
     // If already logged in, redirect
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
@@ -49,27 +55,32 @@ export class LoginComponent implements OnInit {
 
     const credentials: LoginRequest = {
       email: this.loginForm.value.email,
-      password: this.loginForm.value.password
+      password: this.loginForm.value.password,
     };
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        if (response.success) {
+        console.log('Login response:', response); // Debug log
+
+        // Add null check
+        if (response && response.success) {
           this.router.navigate([this.returnUrl]);
         } else {
-          this.errorMessage = response.message || 'Login failed';
+          this.errorMessage = response?.message || 'Login failed';
         }
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Login failed. Please check your credentials.';
+        console.error('Login error:', error); // Debug log
+        this.errorMessage =
+          error?.message || 'Login failed. Please check your credentials.';
         this.isLoading = false;
-      }
+      },
     });
   }
 
   private markFormGroupTouched(formGroup: FormGroup) {
-    Object.values(formGroup.controls).forEach(control => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);

@@ -41,12 +41,14 @@ import { AuthService } from '../../../../core/services/auth.service';
                   Member since {{ formatDate(user?.created_at) }}
                 </div>
                 
-                <div *ngIf="user?.phone" class="flex items-center">
+                @if (user?.phone) {
+                  <div class="flex items-center">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                   </svg>
                   {{ user?.phone }}
-                </div>
+                  </div>
+                }
               </div>
             </div>
           </div>
@@ -64,10 +66,11 @@ import { AuthService } from '../../../../core/services/auth.service';
                 <input type="text" formControlName="name"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        [class.border-red-500]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
-                <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" 
-                     class="mt-1 text-sm text-red-600">
-                  Name is required
-                </div>
+                @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+                  <div class="mt-1 text-sm text-red-600">
+                    Name is required
+                  </div>
+                }
               </div>
 
               <!-- Email -->
@@ -76,10 +79,11 @@ import { AuthService } from '../../../../core/services/auth.service';
                 <input type="email" formControlName="email"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
-                <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" 
-                     class="mt-1 text-sm text-red-600">
-                  Valid email is required
-                </div>
+                @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                  <div class="mt-1 text-sm text-red-600">
+                    Valid email is required
+                  </div>
+                }
               </div>
 
               <!-- Phone -->

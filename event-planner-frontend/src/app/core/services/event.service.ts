@@ -27,8 +27,10 @@ export class EventService {
   }
 
   // Get event by ID
-  getEventById(id: number): Observable<ApiResponse<Event>> {
-    return this.apiService.get<Event>(`events/${id}`);
+  getEventById(id: number | string): Observable<ApiResponse<Event>> {
+    // Ensure ID is converted to number to match backend type requirement
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    return this.apiService.get<Event>(`events/${numericId}`);
   }
 
   // Create event
@@ -37,13 +39,15 @@ export class EventService {
   }
 
   // Update event
-  updateEvent(id: number, eventData: UpdateEventRequest): Observable<ApiResponse<Event>> {
-    return this.apiService.put<Event>(`events/${id}`, eventData);
+  updateEvent(id: number | string, eventData: UpdateEventRequest): Observable<ApiResponse<Event>> {
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    return this.apiService.put<Event>(`events/${numericId}`, eventData);
   }
 
   // Delete event
-  deleteEvent(id: number): Observable<ApiResponse<void>> {
-    return this.apiService.delete<void>(`events/${id}`);
+  deleteEvent(id: number | string): Observable<ApiResponse<void>> {
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    return this.apiService.delete<void>(`events/${numericId}`);
   }
 
   // Get events by category
@@ -53,12 +57,14 @@ export class EventService {
   }
 
   // Register for event
-  registerForEvent(eventId: number): Observable<ApiResponse<any>> {
-    return this.apiService.post<any>(`events/${eventId}/register`, {});
+  registerForEvent(eventId: number | string): Observable<ApiResponse<any>> {
+    const numericId = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+    return this.apiService.post<any>(`events/${numericId}/register`, {});
   }
 
   // Check registration status
-  checkRegistration(eventId: number): Observable<ApiResponse<{is_registered: boolean}>> {
-    return this.apiService.get<{is_registered: boolean}>(`registrations/check/${eventId}`);
+  checkRegistration(eventId: number | string): Observable<ApiResponse<{is_registered: boolean}>> {
+    const numericId = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+    return this.apiService.get<{is_registered: boolean}>(`registrations/check/${numericId}`);
   }
 }

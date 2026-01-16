@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RegisterRequest } from '../../../../core/models/auth.model';
 
 @Component({
   selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  templateUrl: './register.component.html' // The HTML template above
 })
 export class RegisterComponent {
   registerForm: FormGroup;
@@ -22,7 +24,6 @@ export class RegisterComponent {
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       password_confirmation: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
@@ -33,7 +34,7 @@ export class RegisterComponent {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('password_confirmation')?.value;
     
-    if (password !== confirmPassword) {
+    if (password !== confirmPassword && confirmPassword) {
       control.get('password_confirmation')?.setErrors({ mismatch: true });
       return { mismatch: true };
     }
@@ -52,7 +53,6 @@ export class RegisterComponent {
     const registerData: RegisterRequest = {
       name: this.registerForm.value.name,
       email: this.registerForm.value.email,
-      phone: this.registerForm.value.phone || undefined,
       password: this.registerForm.value.password,
       password_confirmation: this.registerForm.value.password_confirmation
     };
@@ -67,7 +67,13 @@ export class RegisterComponent {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Registration failed. Please try again.';
+        if (error.error?.errors) {
+          // Handle validation errors from Laravel
+          const errorMessages = Object.values(error.error.errors).flat();
+          this.errorMessage = errorMessages.join(', ');
+        } else {
+          this.errorMessage = error.message || 'Registration failed. Please try again.';
+        }
         this.isLoading = false;
       }
     });

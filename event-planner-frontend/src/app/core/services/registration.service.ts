@@ -20,20 +20,29 @@ export class RegistrationService {
   }
 
   // Get event registrations (admin only)
-  getEventRegistrations(eventId: number, page: number = 1): Observable<ApiResponse<Registration[]>> {
+  getEventRegistrations(eventId: number | string, page: number = 1): Observable<ApiResponse<Registration[]>> {
     const params = {
       page: page.toString()
     };
-    return this.apiService.get<Registration[]>(`registrations/event/${eventId}`, params);
+    const numericId = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+    return this.apiService.get<Registration[]>(`registrations/event/${numericId}`, params);
   }
 
   // Cancel registration
-  cancelRegistration(registrationId: number): Observable<ApiResponse<void>> {
-    return this.apiService.delete<void>(`registrations/${registrationId}`);
+  cancelRegistration(registrationId: number | string): Observable<ApiResponse<void>> {
+    const numericId = typeof registrationId === 'string' ? parseInt(registrationId, 10) : registrationId;
+    return this.apiService.delete<void>(`registrations/${numericId}`);
   }
 
   // Unregister from event
-  unregisterFromEvent(eventId: number): Observable<ApiResponse<void>> {
-    return this.apiService.delete<void>(`registrations/unregister/${eventId}`);
+  unregisterFromEvent(eventId: number | string): Observable<ApiResponse<void>> {
+    const numericId = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+    return this.apiService.delete<void>(`registrations/unregister/${numericId}`);
+  }
+
+  // Register for event
+  registerForEvent(eventId: number | string): Observable<ApiResponse<any>> {
+    const numericId = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+    return this.apiService.post<any>(`events/${numericId}/register`, {});
   }
 }

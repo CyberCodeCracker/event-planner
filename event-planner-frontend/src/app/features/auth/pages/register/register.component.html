@@ -1,0 +1,71 @@
+<div class="w-full">
+  <!-- Title exactly like PDF -->
+  <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">Sign Up to Event Planner</h2>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Name Field -->
+    <div>
+      <label class="pdf-label">YOUR NAME</label>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Enter your name"
+        class="pdf-input"
+        [class.border-red-500]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
+      >
+    </div>
+
+    <!-- Email Field -->
+    <div>
+      <label class="pdf-label">YOUR EMAIL</label>
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Enter your email"
+        class="pdf-input"
+        [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+      >
+    </div>
+
+    <!-- Password Field -->
+    <div>
+      <label class="pdf-label">PASSWORD</label>
+      <input
+        type="password"
+        formControlName="password"
+        placeholder="Enter your password"
+        class="pdf-input"
+        [class.border-red-500]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+      >
+    </div>
+
+    <!-- Confirm Password Field -->
+    <div>
+      <label class="pdf-label">CONFIRM PASSWORD</label>
+      <input
+        type="password"
+        formControlName="password_confirmation"
+        placeholder="Enter your password"
+        class="pdf-input"
+        [class.border-red-500]="registerForm.get('password_confirmation')?.invalid && registerForm.get('password_confirmation')?.touched"
+      >
+    </div>
+
+    <!-- Sign Up Button -->
+    <button
+      type="submit"
+      [disabled]="registerForm.invalid || isLoading"
+      class="pdf-button disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {{ isLoading ? 'Signing Up...' : 'Sign Up' }}
+    </button>
+  </form>
+
+  <!-- Already have an account? -->
+  <div class="mt-8 text-center text-sm text-gray-600">
+    Already have an account? 
+    <a [routerLink]="['/auth/login']" class="text-blue-600 font-medium hover:text-blue-700">
+      Sign In
+    </a>
+  </div>
+</div>

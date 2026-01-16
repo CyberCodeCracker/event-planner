@@ -1,38 +1,28 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+export const authInterceptor: HttpInterceptorFn = (request, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Get the auth token from the service
-    const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('auth_token');
 
-    // Clone the request and add the authorization header
-    if (token) {
-      const cloned = request.clone({
+  const authReq = token
+    ? request.clone({
         headers: request.headers.set('Authorization', `Bearer ${token}`)
-      });
-      return next.handle(cloned).pipe(
-        catchError((error: HttpErrorResponse) => {
-          if (error.status === 401) {
-            // Auto logout if 401 response returned from api
-            this.authService.clearAuth();
-            this.router.navigate(['/auth/login']);
-          }
-          return throwError(() => error);
-        })
-      );
-    }
+      })
+    : request;
 
-    return next.handle(request);
-  }
-}
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        authService.clearAuth();
+        router.navigate(['/auth/login']);
+      }
+      return throwError(() => error);
+    })
+  );
+};

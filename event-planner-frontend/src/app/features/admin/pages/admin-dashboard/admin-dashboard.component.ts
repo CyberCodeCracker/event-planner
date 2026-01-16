@@ -81,7 +81,8 @@ import { CategoryService } from '../../../../core/services/category.service';
         <div class="bg-white rounded-xl shadow p-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Events</h3>
           <div class="space-y-4">
-            <div *ngFor="let event of recentEvents" class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            @for (event of recentEvents; track event.id) {
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
                 <p class="font-medium text-gray-900">{{ event.title }}</p>
                 <p class="text-sm text-gray-500">{{ formatDate(event.created_at) }}</p>
@@ -90,7 +91,8 @@ import { CategoryService } from '../../../../core/services/category.service';
                     class="px-3 py-1 rounded-full text-sm font-medium">
                 {{ event.is_active ? 'Active' : 'Inactive' }}
               </span>
-            </div>
+              </div>
+            }
           </div>
         </div>
 

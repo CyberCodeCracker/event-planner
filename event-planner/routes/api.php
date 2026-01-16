@@ -12,6 +12,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 // Public read-only routes
+// Add specific routes BEFORE resource routes to avoid route conflicts
+Route::get('/events/upcoming', [EventController::class, 'upcoming']);
 Route::apiResource('events', EventController::class)->only(['index', 'show']);
 Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 

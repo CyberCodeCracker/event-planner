@@ -1,14 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap, catchError, throwError } from 'rxjs';
 import { ApiService } from './api.service';
 import { TokenService } from './token.service';
-import { LoginRequest, RegisterRequest, User } from '../models/auth.model';
+import { LoginRequest, RegisterRequest } from '../models/auth.model';
+import { User } from '../models/user.model';
 import { AuthResponse } from '../models/api-response.model';
 import { UserRole } from '../models/user.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiService = inject(ApiService);
@@ -29,27 +30,37 @@ export class AuthService {
     }
   }
 
-  // Login
+  // Login - backend returns AuthResponse directly
   login(credentials: LoginRequest): Observable<AuthResponse<User>> {
     return this.apiService.post<AuthResponse<User>>('login', credentials).pipe(
-      tap(response => {
-        if (response.success && response.token && response.user) {
-          this.tokenService.setToken(response.token);
-          this.tokenService.setUser(response.user);
-          this.currentUserSubject.next(response.user);
+      map((response) => {
+        // Handle both wrapped (response.data) and direct (response itself) responses
+        const authResponse = (response as any).data || response;
+        return authResponse as AuthResponse<User>;
+      }),
+      tap((authResponse) => {
+        if (authResponse && authResponse.success && authResponse.token && authResponse.user) {
+          this.tokenService.setToken(authResponse.token);
+          this.tokenService.setUser(authResponse.user);
+          this.currentUserSubject.next(authResponse.user);
         }
       })
     );
   }
 
-  // Register
+  // Register - backend returns AuthResponse directly
   register(data: RegisterRequest): Observable<AuthResponse<User>> {
     return this.apiService.post<AuthResponse<User>>('register', data).pipe(
-      tap(response => {
-        if (response.success && response.token && response.user) {
-          this.tokenService.setToken(response.token);
-          this.tokenService.setUser(response.user);
-          this.currentUserSubject.next(response.user);
+      map((response) => {
+        // Handle both wrapped (response.data) and direct (response itself) responses
+        const authResponse = (response as any).data || response;
+        return authResponse as AuthResponse<User>;
+      }),
+      tap((authResponse) => {
+        if (authResponse && authResponse.success && authResponse.token && authResponse.user) {
+          this.tokenService.setToken(authResponse.token);
+          this.tokenService.setUser(authResponse.user);
+          this.currentUserSubject.next(authResponse.user);
         }
       })
     );
@@ -61,26 +72,40 @@ export class AuthService {
       tap(() => {
         this.clearAuth();
         this.router.navigate(['/auth/login']);
+      }),
+      catchError((error) => {
+        // Even if logout fails on backend, clear local auth
+        this.clearAuth();
+        this.router.navigate(['/auth/login']);
+        return throwError(() => error);
       })
     );
   }
 
   // Get current user
-  getCurrentUser(): Observable<any> {
-    return this.apiService.get<{ success: boolean; user: User }>('user').pipe(
-      tap(response => {
-        if (response.success && response.user) {
-          this.tokenService.setUser(response.user);
-          this.currentUserSubject.next(response.user);
-        }
-      })
-    );
+  getCurrentUser(): Observable<User> {
+    return this.apiService
+      .get<{ success: boolean; user: User }>('user')
+      .pipe(
+        map((response) => {
+          // Handle both wrapped (response.data) and direct (response itself) responses
+          const userResponse = (response as any).data || response;
+          return userResponse as { success: boolean; user: User };
+        }),
+        tap((userResponse) => {
+          if (userResponse && userResponse.success && userResponse.user) {
+            this.tokenService.setUser(userResponse.user);
+            this.currentUserSubject.next(userResponse.user);
+          }
+        }),
+        map((userResponse) => userResponse.user)
+      );
   }
 
   // Update profile
   updateProfile(data: any): Observable<any> {
     return this.apiService.put<any>('profile', data).pipe(
-      tap(response => {
+      tap((response) => {
         if (response.success && response.data) {
           this.tokenService.setUser(response.data);
           this.currentUserSubject.next(response.data);

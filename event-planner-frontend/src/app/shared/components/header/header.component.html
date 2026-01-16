@@ -14,36 +14,28 @@
              class="text-gray-600 hover:text-blue-600 transition-colors">
             Home
           </a>
-          <a [routerLink]="['/events']" 
-             routerLinkActive="text-blue-600 font-semibold"
-             class="text-gray-600 hover:text-blue-600 transition-colors">
-            Events
-          </a>
-          <a [routerLink]="['/categories']" 
-             routerLinkActive="text-blue-600 font-semibold"
-             class="text-gray-600 hover:text-blue-600 transition-colors">
-            Categories
-          </a>
-          
-          <!-- Admin Links -->
-          <ng-container *ngIf="isAdmin">
-            <a [routerLink]="['/admin/dashboard']" 
+          @if (currentUser) {
+            <a [routerLink]="['/dashboard']" 
                routerLinkActive="text-blue-600 font-semibold"
                class="text-gray-600 hover:text-blue-600 transition-colors">
               Dashboard
             </a>
-            <a [routerLink]="['/admin/categories']" 
+          }
+          
+          <!-- Admin Links -->
+          @if (isAdmin) {
+            <a [routerLink]="['/admin']" 
                routerLinkActive="text-blue-600 font-semibold"
                class="text-gray-600 hover:text-blue-600 transition-colors">
-              Manage Categories
+              Admin
             </a>
-          </ng-container>
+          }
         </div>
       </div>
 
       <!-- Auth Section -->
       <div class="flex items-center space-x-4">
-        <ng-container *ngIf="!currentUser; else userMenu">
+        @if (!currentUser) {
           <a [routerLink]="['/auth/register']" 
              class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
             Sign Up
@@ -52,9 +44,7 @@
              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Sign In
           </a>
-        </ng-container>
-
-        <ng-template #userMenu>
+        } @else {
           <div class="relative group">
             <button class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
               <!-- User Avatar -->
@@ -76,31 +66,27 @@
 
             <!-- Dropdown Menu -->
             <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border py-2 z-50 invisible group-hover:visible">
-              <a [routerLink]="['/profile']" 
+              <a [routerLink]="['/dashboard/profile']" 
                  class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                 View Profile
               </a>
-              <a [routerLink]="['/my-events']" 
+              <a [routerLink]="['/dashboard/my-events']" 
                  class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                 My Events
               </a>
-              <a [routerLink]="['/my-registrations']" 
+              <a [routerLink]="['/dashboard/my-registrations']" 
                  class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                 My Registrations
               </a>
               
               <!-- Admin Options -->
-              <ng-container *ngIf="isAdmin">
+              @if (isAdmin) {
                 <div class="border-t my-2"></div>
-                <a [routerLink]="['/admin/events']" 
+                <a [routerLink]="['/admin']" 
                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                  Manage Events
+                  Admin Dashboard
                 </a>
-                <a [routerLink]="['/admin/users']" 
-                   class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                  Manage Users
-                </a>
-              </ng-container>
+              }
               
               <div class="border-t my-2"></div>
               <button (click)="onLogout()" 
@@ -109,7 +95,7 @@
               </button>
             </div>
           </div>
-        </ng-template>
+        }
       </div>
     </div>
   </nav>
