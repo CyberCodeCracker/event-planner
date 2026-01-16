@@ -22,26 +22,80 @@ export class EventService {
   }
 
   // Get upcoming events
-  getUpcomingEvents(limit: number = 5): Observable<ApiResponse<Event[]>> {
-    return this.apiService.get<Event[]>('events/upcoming');
+  getUpcomingEvents(limit: number = 15): Observable<ApiResponse<Event[]>> {
+    return this.apiService.get<Event[]>('events/upcoming', { limit: limit.toString() }).pipe(
+      map(response => {
+        console.log('EventService: Upcoming events response', response);
+        if (response.data) {
+          response.data.forEach(event => {
+            console.log('EventService: Event image URL from API:', event.image, 'for event:', event.title);
+          });
+        }
+        return response;
+      })
+    );
   }
 
   // Get event by ID
   getEventById(id: number | string): Observable<ApiResponse<Event>> {
     // Ensure ID is converted to number to match backend type requirement
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    if (isNaN(numericId) || numericId <= 0) {
+      throw new Error(`Invalid event ID: ${id}`);
+    }
     return this.apiService.get<Event>(`events/${numericId}`);
   }
 
   // Create event
-  createEvent(eventData: CreateEventRequest): Observable<ApiResponse<Event>> {
-    return this.apiService.post<Event>('events', eventData);
+  createEvent(eventData: CreateEventRequest, imageFile?: File): Observable<ApiResponse<Event>> {
+    const formData = new FormData();
+    
+    formData.append('title', eventData.title);
+    formData.append('description', eventData.description);
+    formData.append('start_date', eventData.start_date);
+    formData.append('end_date', eventData.end_date);
+    formData.append('place', eventData.place);
+    formData.append('price', eventData.price.toString());
+    formData.append('category_id', eventData.category_id.toString());
+    formData.append('capacity', eventData.capacity.toString());
+    
+    // Handle boolean - Laravel expects '1' or '0' for boolean in FormData
+    const isActive = eventData.is_active ?? true;
+    formData.append('is_active', isActive ? '1' : '0');
+    
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+    
+    return this.apiService.upload<Event>('events', formData);
   }
 
   // Update event
-  updateEvent(id: number | string, eventData: UpdateEventRequest): Observable<ApiResponse<Event>> {
+  updateEvent(id: number | string, eventData: UpdateEventRequest, imageFile?: File): Observable<ApiResponse<Event>> {
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
-    return this.apiService.put<Event>(`events/${numericId}`, eventData);
+    const formData = new FormData();
+    
+    if (eventData.title !== undefined) formData.append('title', eventData.title);
+    if (eventData.description !== undefined) formData.append('description', eventData.description);
+    if (eventData.start_date !== undefined) formData.append('start_date', eventData.start_date);
+    if (eventData.end_date !== undefined) formData.append('end_date', eventData.end_date);
+    if (eventData.place !== undefined) formData.append('place', eventData.place);
+    if (eventData.price !== undefined) formData.append('price', eventData.price.toString());
+    if (eventData.category_id !== undefined) formData.append('category_id', eventData.category_id.toString());
+    if (eventData.capacity !== undefined) formData.append('capacity', eventData.capacity.toString());
+    
+    // Handle boolean - Laravel expects '1' or '0' for boolean in FormData
+    if (eventData.is_active !== undefined) {
+      formData.append('is_active', eventData.is_active ? '1' : '0');
+    }
+    
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+    
+    // For PUT requests with FormData, we need to use POST with _method=PUT or use upload method
+    formData.append('_method', 'PUT');
+    return this.apiService.upload<Event>(`events/${numericId}`, formData);
   }
 
   // Delete event

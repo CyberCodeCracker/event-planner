@@ -11,6 +11,7 @@ export class EventCardComponent {
   @Input() showActions = true;
   @Output() register = new EventEmitter<Event>();
   @Output() viewDetails = new EventEmitter<Event>();
+  imageError = false;
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -38,5 +39,40 @@ export class EventCardComponent {
 
   getSpotsAvailable(): number {
     return this.event.available_spots || 0;
+  }
+
+  getImageUrl(imagePath: string | null): string {
+    if (!imagePath) {
+      console.log('EventCard: No image path provided');
+      return '';
+    }
+    
+    console.log('EventCard: Original image path:', imagePath);
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      console.log('EventCard: Using full URL:', imagePath);
+      return imagePath;
+    }
+    
+    // If it starts with /storage, prepend the backend URL
+    if (imagePath.startsWith('/storage') || imagePath.startsWith('storage/')) {
+      const cleanPath = imagePath.startsWith('/') ? imagePath : '/' + imagePath;
+      const fullUrl = `http://localhost:8000${cleanPath}`;
+      console.log('EventCard: Constructed storage URL:', fullUrl);
+      return fullUrl;
+    }
+    
+    // Otherwise, assume it's a relative path and prepend backend URL
+    const fullUrl = `http://localhost:8000/${imagePath}`;
+    console.log('EventCard: Constructed relative URL:', fullUrl);
+    return fullUrl;
+  }
+
+  onImageError(event: any) {
+    console.error('EventCard: Image failed to load:', event.target.src);
+    // Set flag to show placeholder instead
+    this.imageError = true;
+    event.target.style.display = 'none';
   }
 }

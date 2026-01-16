@@ -88,8 +88,22 @@ export class ApiService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
+    // Check if _method is set for PUT/PATCH requests
+    const method = formData.get('_method') as string;
+    const url = `${this.baseUrl}/${endpoint}`;
+    
     // Don't set Content-Type for FormData, let browser set it with boundary
-    return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData, { headers })
+    if (method === 'PUT') {
+      formData.delete('_method');
+      return this.http.put<ApiResponse<T>>(url, formData, { headers })
+        .pipe(catchError(this.handleError));
+    } else if (method === 'PATCH') {
+      formData.delete('_method');
+      return this.http.patch<ApiResponse<T>>(url, formData, { headers })
+        .pipe(catchError(this.handleError));
+    }
+    
+    return this.http.post<ApiResponse<T>>(url, formData, { headers })
       .pipe(catchError(this.handleError));
   }
 

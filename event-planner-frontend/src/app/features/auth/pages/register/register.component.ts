@@ -10,9 +10,9 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="min-h-screen flex">
+    <div class="min-h-screen w-screen flex overflow-hidden">
       <!-- Left Side - Welcome Section -->
-      <div class="hidden lg:flex lg:w-1/3 bg-cover bg-center relative" 
+      <div class="hidden lg:flex lg:w-1/3 bg-cover bg-center relative flex-shrink-0" 
            style="background-image: url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80');">
         <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         <div class="relative z-10 flex flex-col justify-center items-center text-white p-8">
@@ -26,8 +26,8 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
       </div>
 
       <!-- Right Side - Register Form -->
-      <div class="flex-1 flex items-center justify-center bg-gray-100 p-8">
-        <div class="w-full max-w-md">
+      <div class="flex-1 flex items-center justify-center bg-gray-100 p-8 overflow-y-auto min-w-0">
+        <div class="w-full max-w-md overflow-hidden">
           <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">
               Event <span class="text-purple-600">Planner</span>

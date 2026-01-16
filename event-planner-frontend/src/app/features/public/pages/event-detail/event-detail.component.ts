@@ -25,7 +25,10 @@ import { AuthService } from '../../../../core/services/auth.service';
         @if (event) {
           <div class="relative h-[400px] overflow-hidden">
             @if (event.image) {
-              <img [src]="event.image" [alt]="event.title" class="w-full h-full object-cover">
+              <img [src]="getImageUrl(event.image)" 
+                   [alt]="event.title" 
+                   class="w-full h-full object-cover"
+                   (error)="onImageError($event)">
             } @else {
               <div class="w-full h-full bg-gradient-to-r from-purple-500 to-indigo-600"></div>
             }
@@ -125,7 +128,7 @@ import { AuthService } from '../../../../core/services/auth.service';
       </div>
     }
   `,
-  imports: [CommonModule, RouterLink, EventCardComponent]
+  imports: [CommonModule, EventCardComponent]
 })
 export class EventDetailComponent implements OnInit {
   event: Event | null = null;
@@ -142,14 +145,29 @@ export class EventDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const eventId = this.route.snapshot.paramMap.get('id');
-    if (eventId) {
-      this.loadEvent(+eventId);
-      this.loadOtherEvents(+eventId);
-    }
+    this.route.paramMap.subscribe(params => {
+      const eventId = params.get('id');
+      if (eventId) {
+        const numericId = parseInt(eventId, 10);
+        if (!isNaN(numericId) && numericId > 0) {
+          this.loadEvent(numericId);
+          this.loadOtherEvents(numericId);
+        } else {
+          console.error('Invalid event ID:', eventId);
+          this.router.navigate(['/']);
+        }
+      } else {
+        this.router.navigate(['/']);
+      }
+    });
   }
 
   loadEvent(id: number) {
+    if (isNaN(id) || id <= 0) {
+      console.error('Invalid event ID:', id);
+      this.router.navigate(['/']);
+      return;
+    }
     this.isLoading = true;
     this.eventService.getEventById(id).subscribe({
       next: (response) => {
@@ -236,16 +254,42 @@ export class EventDetailComponent implements OnInit {
       return;
     }
 
-    this.registrationService.registerForEvent(event.id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          alert('Successfully registered for ' + event.title);
-        }
-      },
-      error: (error) => {
-        console.error('Registration error:', error);
-        alert('Failed to register. Please try again.');
-      }
-    });
+    // Use the same modal as the "Book now" button
+    this.event = event;
+    this.openBookModal();
+  }
+
+  getImageUrl(imagePath: string | null): string {
+    if (!imagePath) {
+      console.log('EventDetail: No image path provided');
+      return '';
+    }
+    
+    console.log('EventDetail: Original image path:', imagePath);
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      console.log('EventDetail: Using full URL:', imagePath);
+      return imagePath;
+    }
+    
+    // If it starts with /storage, prepend the backend URL
+    if (imagePath.startsWith('/storage') || imagePath.startsWith('storage/')) {
+      const cleanPath = imagePath.startsWith('/') ? imagePath : '/' + imagePath;
+      const fullUrl = `http://localhost:8000${cleanPath}`;
+      console.log('EventDetail: Constructed storage URL:', fullUrl);
+      return fullUrl;
+    }
+    
+    // Otherwise, assume it's a relative path and prepend backend URL
+    const fullUrl = `http://localhost:8000/${imagePath}`;
+    console.log('EventDetail: Constructed relative URL:', fullUrl);
+    return fullUrl;
+  }
+
+  onImageError(event: any) {
+    console.error('EventDetail: Image failed to load:', event.target.src);
+    // Hide broken image and show placeholder
+    event.target.style.display = 'none';
   }
 }

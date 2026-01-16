@@ -32,6 +32,37 @@ class EventDTO
 
     public static function fromModel(Event $event, ?bool $isRegistered = null): self
     {
+        // Convert storage path to full URL if image exists
+        $imageUrl = null;
+        if ($event->image) {
+            \Log::info('EventDTO: Processing image', [
+                'original_path' => $event->image,
+                'event_id' => $event->id
+            ]);
+            
+            if (str_starts_with($event->image, 'http://') || str_starts_with($event->image, 'https://')) {
+                // Already a full URL
+                $imageUrl = $event->image;
+                \Log::info('EventDTO: Image already full URL', ['url' => $imageUrl]);
+            } else {
+                // Convert storage path to URL - ensure it starts with /storage
+                $imagePath = $event->image;
+                if (!str_starts_with($imagePath, '/')) {
+                    $imagePath = '/' . $imagePath;
+                }
+                // Use asset() which will generate the full URL with APP_URL
+                $imageUrl = asset($imagePath);
+                \Log::info('EventDTO: Generated image URL', [
+                    'original' => $event->image,
+                    'processed_path' => $imagePath,
+                    'final_url' => $imageUrl,
+                    'app_url' => config('app.url')
+                ]);
+            }
+        } else {
+            \Log::info('EventDTO: No image for event', ['event_id' => $event->id]);
+        }
+
         return new self(
             id: $event->id,
             title: $event->title,
@@ -42,7 +73,7 @@ class EventDTO
             price: (float) $event->price,
             category_id: $event->category_id,
             capacity: $event->capacity,
-            image: $event->image,
+            image: $imageUrl,
             created_by: $event->created_by,
             is_active: $event->is_active,
             created_at: $event->created_at->toIso8601String(),

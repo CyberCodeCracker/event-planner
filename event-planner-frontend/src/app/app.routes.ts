@@ -54,6 +54,13 @@ export const routes: Routes = [
     ]
   },
 
+  // Redirect /events/create to admin route
+  {
+    path: 'events/create',
+    redirectTo: '/admin/events/create',
+    pathMatch: 'full'
+  },
+
   // Dashboard Routes (Authenticated Users)
   {
     path: 'dashboard',

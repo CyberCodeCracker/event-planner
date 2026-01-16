@@ -10,6 +10,7 @@ use App\Models\Event;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 
 class EventService
@@ -54,6 +55,12 @@ class EventService
         $data['created_by'] = $user->id;
         $data['is_active'] = $data['is_active'] ?? true;
 
+        // Handle image file upload
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+            $imagePath = $this->storeImage($data['image']);
+            $data['image'] = $imagePath;
+        }
+
         Log::info('Event data before creation', [
             'final_data' => $data
         ]);
@@ -79,10 +86,46 @@ class EventService
 
     public function updateEvent(int $eventId, array $data): EventDTO
     {
+        // Handle image file upload
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+            // Delete old image if exists
+            $oldEvent = $this->eventRepository->find($eventId);
+            if ($oldEvent && $oldEvent->image) {
+                $this->deleteImage($oldEvent->image);
+            }
+            
+            $imagePath = $this->storeImage($data['image']);
+            $data['image'] = $imagePath;
+        }
+
         $this->eventRepository->update($eventId, $data);
         $event = $this->eventRepository->find($eventId);
 
         return EventDTO::fromModel($event);
+    }
+
+    /**
+     * Store uploaded image and return the path
+     */
+    private function storeImage(\Illuminate\Http\UploadedFile $file): string
+    {
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('public/events', $filename);
+        
+        // Return the public URL path (storage/events/filename)
+        return 'storage/events/' . $filename;
+    }
+
+    /**
+     * Delete image file
+     */
+    private function deleteImage(string $imagePath): void
+    {
+        // Convert storage/events/filename to the actual storage path
+        $storagePath = str_replace('storage/', 'public/', $imagePath);
+        if (Storage::exists($storagePath)) {
+            Storage::delete($storagePath);
+        }
     }
 
     public function deleteEvent(int $eventId): bool

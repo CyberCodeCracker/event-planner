@@ -54,20 +54,24 @@ class AuthService
     public function logout(): bool
     {
         try {
-            $user = Auth::user();
+            // Get the token from the Authorization header
+            $token = request()->bearerToken();
             
-            if (!$user) {
+            if (!$token) {
                 return false;
             }
             
-            // Delete all tokens for the user (more reliable than currentAccessToken)
-            // This ensures all tokens are revoked
-            $user->tokens()->delete();
+            // Hash the token to match what's in the database
+            $hashedToken = hash('sha256', $token);
             
-            return true;
+            // Delete the token from the database
+            $deleted = DB::table('personal_access_tokens')
+                ->where('token', $hashedToken)
+                ->delete();
+            
+            return $deleted > 0;
             
         } catch (\Exception $e) {
-            Log::error('Logout error: ' . $e->getMessage());
             return false;
         }
     }

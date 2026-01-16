@@ -115,6 +115,28 @@ import { AuthService } from '../../../../core/services/auth.service';
         }
       </div>
     </div>
+
+    <!-- Book Event Modal -->
+    @if (showBookModal && selectedEvent) {
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeBookModal()">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Book Event</h2>
+          <div class="space-y-4">
+            <p class="text-gray-600">Are you sure you want to book <strong>{{ selectedEvent.title }}</strong>?</p>
+            <div class="flex gap-4 pt-4">
+              <button (click)="closeBookModal()" 
+                      class="flex-1 px-6 py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium">
+                Cancel
+              </button>
+              <button (click)="bookEvent()" 
+                      class="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                Book now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   `,
   imports: [CommonModule, EventCardComponent, FormsModule]
 })
@@ -127,6 +149,8 @@ export class HomeComponent implements OnInit {
   selectedWeekday = '';
   selectedCategory = '';
   displayedCount = 6;
+  showBookModal = false;
+  selectedEvent: Event | null = null;
 
   constructor(
     private eventService: EventService,
@@ -204,7 +228,11 @@ export class HomeComponent implements OnInit {
   }
 
   onViewDetails(event: Event) {
-    this.router.navigate(['/events', event.id]);
+    if (event && event.id) {
+      this.router.navigate(['/events', event.id]);
+    } else {
+      console.error('Invalid event or event ID:', event);
+    }
   }
 
   onRegister(event: Event) {
@@ -213,15 +241,30 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    this.registrationService.registerForEvent(event.id).subscribe({
+    this.selectedEvent = event;
+    this.showBookModal = true;
+  }
+
+  closeBookModal() {
+    this.showBookModal = false;
+    this.selectedEvent = null;
+  }
+
+  bookEvent() {
+    if (!this.selectedEvent) return;
+    
+    this.registrationService.registerForEvent(this.selectedEvent.id).subscribe({
       next: (response) => {
         if (response.success) {
-          alert('Successfully registered for ' + event.title);
+          alert('Successfully booked ' + this.selectedEvent!.title);
+          this.closeBookModal();
+          // Optionally reload events to update registration status
+          this.loadEvents();
         }
       },
       error: (error) => {
-        console.error('Registration error:', error);
-        alert('Failed to register. Please try again.');
+        console.error('Booking error:', error);
+        alert('Failed to book event. Please try again.');
       }
     });
   }

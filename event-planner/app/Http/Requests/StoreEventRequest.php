@@ -12,6 +12,23 @@ class StoreEventRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Prepare the data for validation.
+     * Convert FormData boolean strings to actual booleans
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('is_active')) {
+            $value = $this->input('is_active');
+            // Convert string '1', 'true', 'on', 'yes' to true, everything else to false
+            if (is_string($value)) {
+                $this->merge([
+                    'is_active' => in_array(strtolower($value), ['1', 'true', 'on', 'yes'], true)
+                ]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -23,8 +40,8 @@ class StoreEventRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'category_id' => ['required', 'exists:categories,id'],
             'capacity' => ['required', 'integer', 'min:1'],
-            'image' => ['nullable', 'string', 'max:255'],
-            'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,gif,webp', 'max:5120'], // 5MB max
+            'is_active' => ['nullable', 'boolean'],
         ];
     }
 

@@ -169,7 +169,8 @@ class EventController extends Controller
      */
     public function upcoming(Request $request): JsonResponse
     {
-        $events = $this->eventService->getUpcomingEvents(5);
+        $limit = $request->input('limit', 15); // Default to 15, allow override via query parameter
+        $events = $this->eventService->getUpcomingEvents((int)$limit);
 
         return response()->json([
             'success' => true,

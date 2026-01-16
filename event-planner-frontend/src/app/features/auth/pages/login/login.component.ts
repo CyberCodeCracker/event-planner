@@ -12,7 +12,7 @@ import { LoginRequest } from '../../../../core/models/auth.model';
 @Component({
   selector: 'app-login',
   template: `
-    <div class="min-h-screen flex">
+    <div class="min-h-screen w-screen flex">
       <!-- Left Side - Welcome Section -->
       <div class="hidden lg:flex lg:w-1/3 bg-cover bg-center relative" 
            style="background-image: url('https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80');">

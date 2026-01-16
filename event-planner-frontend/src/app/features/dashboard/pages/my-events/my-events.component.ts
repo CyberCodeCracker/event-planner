@@ -81,7 +81,7 @@ import { Event } from '../../../../core/models/event.model';
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
                     <p class="mb-4">You haven't created any events yet.</p>
-                    <a [routerLink]="['/events/create']" 
+                    <a [routerLink]="['/admin/events/create']" 
                        class="text-blue-600 hover:text-blue-700 font-medium">
                       Create your first event →
                     </a>
