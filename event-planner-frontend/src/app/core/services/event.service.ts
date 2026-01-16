@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { Event, CreateEventRequest, UpdateEventRequest } from '../models/event.model';
 import { ApiResponse } from '../models/api-response.model';
@@ -23,17 +22,7 @@ export class EventService {
 
   // Get upcoming events
   getUpcomingEvents(limit: number = 15): Observable<ApiResponse<Event[]>> {
-    return this.apiService.get<Event[]>('events/upcoming', { limit: limit.toString() }).pipe(
-      map(response => {
-        console.log('EventService: Upcoming events response', response);
-        if (response.data) {
-          response.data.forEach(event => {
-            console.log('EventService: Event image URL from API:', event.image, 'for event:', event.title);
-          });
-        }
-        return response;
-      })
-    );
+    return this.apiService.get<Event[]>('events/upcoming', { limit: limit.toString() });
   }
 
   // Get event by ID

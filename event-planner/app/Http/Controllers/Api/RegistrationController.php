@@ -152,7 +152,9 @@ class RegistrationController extends Controller
         
         return response()->json([
             'success' => true,
-            'is_registered' => $isRegistered,
+            'data' => [
+                'is_registered' => $isRegistered,
+            ],
             'message' => $isRegistered ? 'User is registered for this event' : 'User is not registered'
         ]);
     }

@@ -96,9 +96,15 @@ class EventRepository extends BaseRepository implements EventRepositoryInterface
             return false;
         }
         
-        // Check if event has registrations
-        if ($event->registrations()->exists()) {
-            throw new \Exception('Cannot delete event with existing registrations');
+        // Delete all registrations for this event first (cascade delete)
+        $event->registrations()->delete();
+        
+        // Delete the event image if it exists
+        if ($event->image) {
+            $storagePath = str_replace('storage/', '', $event->image);
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($storagePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($storagePath);
+            }
         }
         
         return parent::delete($event->id);

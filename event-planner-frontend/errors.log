@@ -1,0 +1,50 @@
+﻿
+> event-planner-frontend@0.0.0 npx
+> ng build
+
+[33mÔØ»[39m Building...
+[32mÔ£ö[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mmain-WL7JL326.js[39m     [2m | [22m[2mmain[22m         [2m | [22m[36m402.81 kB[39m[2m | [22m               [36m92.53 kB[39m
+[32mpolyfills-B6TNHZQ6.js[39m[2m | [22m[2mpolyfills[22m    [2m | [22m [36m34.58 kB[39m[2m | [22m               [36m11.32 kB[39m
+[32mstyles-PRGIKL6Z.css[39m  [2m | [22m[2mstyles[22m       [2m | [22m [36m28.27 kB[39m[2m | [22m                [36m4.62 kB[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m[2m | [22m[1m465.66 kB[22m[2m | [22m              [1m108.47 kB[22m
+
+Application bundle generation complete. [5.263 seconds]
+
+[1m[33m[33mÔû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mTS-998113: RouterLink is not used within the template of ListEventsComponent[0m [1m[35m[plugin angular-compiler][0m
+System.Management.Automation.RemoteException
+    src/app/features/admin/pages/list-events/list-events.component.ts:91:26:
+[37m      91 Ôöé   imports: [CommonModule, [32mRouterLink[37m]
+         ÔòÁ                           [32m~~~~~~~~~~[0m
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+[33mÔû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator.[0m [1m[35m[plugin angular-compiler][0m
+System.Management.Automation.RemoteException
+    src/app/shared/components/header/header.component.html:58:69:
+[37m      58 Ôöé ...  <p class="font-medium text-gray-900">{{ currentUser?.[32mname[37m }}</p>
+         ÔòÁ                                                           [32m~~~~[0m
+System.Management.Automation.RemoteException
+  Error occurs in the template of component HeaderComponent.
+System.Management.Automation.RemoteException
+    src/app/shared/components/header/header.component.ts:10:15:
+[37m      10 Ôöé   templateUrl: [32m'./header.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+[33mÔû▓ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator.[0m [1m[35m[plugin angular-compiler][0m
+System.Management.Automation.RemoteException
+    src/app/shared/components/header/header.component.html:59:65:
+[37m      59 Ôöé ...     <p class="text-sm text-gray-500">{{ currentUser?.[32memail[37m }}</p>
+         ÔòÁ                                                          [32m~~~~~[0m
+System.Management.Automation.RemoteException
+  Error occurs in the template of component HeaderComponent.
+System.Management.Automation.RemoteException
+    src/app/shared/components/header/header.component.ts:10:15:
+[37m      10 Ôöé   templateUrl: [32m'./header.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+System.Management.Automation.RemoteException
+[39m[22m
+Output location: C:\projects\event_planner\event-planner\event-planner-frontend\dist\event-planner-frontend
+

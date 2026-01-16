@@ -48,6 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Event registration
     Route::post('/events/{event}/register', [RegistrationController::class, 'store']);
     Route::delete('/registrations/{registration}', [RegistrationController::class, 'destroy']);
+    
+    // Check registration status and unregister by event ID
+    Route::get('/registrations/check/{eventId}', [RegistrationController::class, 'check']);
+    Route::delete('/registrations/unregister/{eventId}', [RegistrationController::class, 'unregister']);
 
     // Admin-only routes
     Route::middleware('admin')->group(function () {

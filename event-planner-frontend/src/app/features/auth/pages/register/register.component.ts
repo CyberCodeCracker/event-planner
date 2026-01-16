@@ -10,14 +10,14 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="min-h-screen w-screen flex overflow-hidden">
+    <div class="min-h-screen w-screen flex overflow-x-hidden overflow-y-auto">
       <!-- Left Side - Welcome Section -->
-      <div class="hidden lg:flex lg:w-1/3 bg-cover bg-center relative flex-shrink-0" 
+      <div class="hidden lg:flex lg:w-3/5 bg-cover bg-center relative flex-shrink-0" 
            style="background-image: url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80');">
         <div class="absolute inset-0 bg-black bg-opacity-60"></div>
-        <div class="relative z-10 flex flex-col justify-center items-center text-white p-8">
+        <div class="relative z-10 flex flex-col justify-center items-center text-white p-8 w-full text-center">
           <h1 class="text-5xl font-bold mb-4">Welcome back</h1>
-          <p class="text-xl text-center mb-8">To keep connected with us provide us with your information</p>
+          <p class="text-xl mb-8 max-w-md">To keep connected with us provide us with your information</p>
           <button (click)="navigateToLogin()" 
                   class="px-8 py-3 bg-gray-600 bg-opacity-50 border-2 border-white rounded-lg hover:bg-opacity-70 transition-colors">
             Signin
@@ -26,8 +26,8 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
       </div>
 
       <!-- Right Side - Register Form -->
-      <div class="flex-1 flex items-center justify-center bg-gray-100 p-8 overflow-y-auto min-w-0">
-        <div class="w-full max-w-md overflow-hidden">
+      <div class="flex-1 lg:w-2/5 flex items-center justify-center bg-gray-100 p-8 overflow-y-auto min-w-0">
+        <div class="w-full max-w-md">
           <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">
               Event <span class="text-purple-600">Planner</span>
@@ -54,7 +54,7 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 type="text"
                 formControlName="name"
                 placeholder="Enter your name"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
               />
             </div>
@@ -65,7 +65,7 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 type="email"
                 formControlName="email"
                 placeholder="Enter your email"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
               />
             </div>
@@ -76,7 +76,7 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 type="password"
                 formControlName="password"
                 placeholder="Enter your password"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
               />
             </div>
@@ -87,7 +87,7 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 type="password"
                 formControlName="password_confirmation"
                 placeholder="Enter your password"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('password_confirmation')?.invalid && registerForm.get('password_confirmation')?.touched"
               />
             </div>

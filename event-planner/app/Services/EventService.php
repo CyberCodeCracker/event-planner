@@ -47,11 +47,6 @@ class EventService
 
     public function createEvent(array $data, User $user): EventDTO
     {
-        Log::info('EventService::createEvent called', [
-            'data_received' => $data,
-            'user_id' => $user->id
-        ]);
-
         $data['created_by'] = $user->id;
         $data['is_active'] = $data['is_active'] ?? true;
 
@@ -61,23 +56,12 @@ class EventService
             $data['image'] = $imagePath;
         }
 
-        Log::info('Event data before creation', [
-            'final_data' => $data
-        ]);
-
         try {
             $event = $this->eventRepository->create($data);
-
-            Log::info('EventRepository::create succeeded', [
-                'event_id' => $event->id,
-                'event_data' => $event->toArray()
-            ]);
-
             return EventDTO::fromModel($event);
         } catch (\Exception $e) {
             Log::error('EventRepository::create failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
                 'data' => $data
             ]);
             throw $e;
@@ -110,7 +94,9 @@ class EventService
     private function storeImage(\Illuminate\Http\UploadedFile $file): string
     {
         $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('public/events', $filename);
+        
+        // Explicitly use the 'public' disk to store in storage/app/public/events
+        $path = $file->storeAs('events', $filename, 'public');
         
         // Return the public URL path (storage/events/filename)
         return 'storage/events/' . $filename;
@@ -121,10 +107,10 @@ class EventService
      */
     private function deleteImage(string $imagePath): void
     {
-        // Convert storage/events/filename to the actual storage path
-        $storagePath = str_replace('storage/', 'public/', $imagePath);
-        if (Storage::exists($storagePath)) {
-            Storage::delete($storagePath);
+        // Convert storage/events/filename to events/filename for the public disk
+        $storagePath = str_replace('storage/', '', $imagePath);
+        if (Storage::disk('public')->exists($storagePath)) {
+            Storage::disk('public')->delete($storagePath);
         }
     }
 

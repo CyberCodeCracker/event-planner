@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -44,9 +44,10 @@ import { AuthService } from '../../core/services/auth.service';
 
             <!-- User Profile -->
             <div class="flex items-center space-x-4">
-              <div class="relative">
-                <button (click)="toggleDropdown()" 
-                        class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none">
+              <div class="relative"
+                   (mouseenter)="showDropdown()"
+                   (mouseleave)="hideDropdownWithDelay()">
+                <button class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none">
                   <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                     <span class="text-purple-600 font-semibold text-sm">{{ getUserInitials() }}</span>
                   </div>
@@ -61,24 +62,26 @@ import { AuthService } from '../../core/services/auth.service';
 
                 <!-- Dropdown Menu -->
                 @if (isDropdownOpen) {
-                  <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border py-2 z-50">
+                  <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border py-2 z-50"
+                       (mouseenter)="showDropdown()"
+                       (mouseleave)="hideDropdownWithDelay()">
                     <a [routerLink]="['/dashboard/profile']" 
-                       (click)="isDropdownOpen = false"
+                       (click)="closeDropdown()"
                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                       View Profile
                     </a>
                     <a [routerLink]="['/dashboard/my-events']" 
-                       (click)="isDropdownOpen = false"
+                       (click)="closeDropdown()"
                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                       My Events
                     </a>
                     <a [routerLink]="['/dashboard/my-registrations']" 
-                       (click)="isDropdownOpen = false"
+                       (click)="closeDropdown()"
                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                       My Registrations
                     </a>
                     <a [routerLink]="['/']" 
-                       (click)="isDropdownOpen = false"
+                       (click)="closeDropdown()"
                        class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                       Home
                     </a>
@@ -102,9 +105,10 @@ import { AuthService } from '../../core/services/auth.service';
     </div>
   `
 })
-export class AdminLayoutComponent implements OnInit {
+export class AdminLayoutComponent implements OnInit, OnDestroy {
   user: any = null;
   isDropdownOpen = false;
+  private hideTimeoutId: any = null;
 
   constructor(
     public authService: AuthService,
@@ -117,20 +121,36 @@ export class AdminLayoutComponent implements OnInit {
     });
   }
 
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
+  ngOnDestroy() {
+    this.clearHideTimeout();
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.relative')) {
+  showDropdown() {
+    this.clearHideTimeout();
+    this.isDropdownOpen = true;
+  }
+
+  hideDropdownWithDelay() {
+    this.clearHideTimeout();
+    this.hideTimeoutId = setTimeout(() => {
       this.isDropdownOpen = false;
+    }, 1000); // 1 second delay
+  }
+
+  closeDropdown() {
+    this.clearHideTimeout();
+    this.isDropdownOpen = false;
+  }
+
+  private clearHideTimeout() {
+    if (this.hideTimeoutId) {
+      clearTimeout(this.hideTimeoutId);
+      this.hideTimeoutId = null;
     }
   }
 
   onLogout() {
-    this.isDropdownOpen = false;
+    this.closeDropdown();
     this.authService.logout().subscribe({
       next: () => {
         // Navigation is handled in the auth service

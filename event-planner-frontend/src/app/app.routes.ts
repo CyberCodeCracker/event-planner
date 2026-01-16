@@ -28,6 +28,7 @@ import { AdminDashboardComponent } from './features/admin/pages/admin-dashboard/
 import { ListEventsComponent } from './features/admin/pages/list-events/list-events.component';
 import { ListCategoriesComponent } from './features/admin/pages/list-categories/list-categories.component';
 import { ListRegistrationsComponent } from './features/admin/pages/list-registrations/list-registrations.component';
+import { ListUsersComponent } from './features/admin/pages/list-users/list-users.component';
 import { CreateEventComponent } from './features/admin/pages/create-event/create-event.component';
 
 export const routes: Routes = [
@@ -87,6 +88,7 @@ export const routes: Routes = [
       { path: 'events/edit/:id', component: CreateEventComponent },
       { path: 'categories', component: ListCategoriesComponent },
       { path: 'registrations', component: ListRegistrationsComponent },
+      { path: 'users', component: ListUsersComponent },
       { path: '**', redirectTo: '' }
     ]
   },

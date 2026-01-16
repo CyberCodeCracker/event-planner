@@ -23,20 +23,23 @@ import { AuthService } from '../../core/services/auth.service';
               
               <!-- Logo -->
               <div class="flex-shrink-0 flex items-center">
-                <h1 class="text-xl font-bold text-blue-600">Dashboard</h1>
+                <h1 class="text-xl font-bold text-gray-900">Event <span class="text-purple-600">Planner</span></h1>
               </div>
             </div>
             
             <!-- User Menu -->
             <div class="flex items-center">
+              <a routerLink="/" class="mr-4 text-sm text-gray-600 hover:text-purple-600 transition-colors">
+                ← Back to Home
+              </a>
               <div class="relative ml-3">
                 <div class="flex items-center space-x-3">
                   <div class="text-right hidden md:block">
                     <p class="text-sm font-medium text-gray-900">{{ user?.name }}</p>
                     <p class="text-xs text-gray-500">{{ user?.role_label }}</p>
                   </div>
-                  <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-blue-600 font-semibold text-sm">{{ getUserInitials() }}</span>
+                  <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span class="text-purple-600 font-semibold text-sm">{{ getUserInitials() }}</span>
                   </div>
                 </div>
               </div>
@@ -52,25 +55,17 @@ import { AuthService } from '../../core/services/auth.service';
           <nav class="mt-5 px-2">
             <div class="space-y-1">
               <a [routerLink]="['/dashboard']" 
-                 [routerLinkActive]="['bg-blue-50', 'text-blue-600']"
+                 [routerLinkActive]="['bg-purple-50', 'text-purple-600']"
+                 [routerLinkActiveOptions]="{exact: true}"
                  class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 hover:bg-gray-100">
                 <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                 </svg>
                 <span [class]="isSidebarOpen ? '' : 'hidden md:hidden'">Dashboard</span>
               </a>
-              
-              <a [routerLink]="['/dashboard/my-events']" 
-                 [routerLinkActive]="['bg-blue-50', 'text-blue-600']"
-                 class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 hover:bg-gray-100">
-                <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <span [class]="isSidebarOpen ? '' : 'hidden md:hidden'">My Events</span>
-              </a>
-              
+    
               <a [routerLink]="['/dashboard/my-registrations']" 
-                 [routerLinkActive]="['bg-blue-50', 'text-blue-600']"
+                 [routerLinkActive]="['bg-purple-50', 'text-purple-600']"
                  class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 hover:bg-gray-100">
                 <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -79,7 +74,7 @@ import { AuthService } from '../../core/services/auth.service';
               </a>
               
               <a [routerLink]="['/dashboard/profile']" 
-                 [routerLinkActive]="['bg-blue-50', 'text-blue-600']"
+                 [routerLinkActive]="['bg-purple-50', 'text-purple-600']"
                  class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-900 hover:bg-gray-100">
                 <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>

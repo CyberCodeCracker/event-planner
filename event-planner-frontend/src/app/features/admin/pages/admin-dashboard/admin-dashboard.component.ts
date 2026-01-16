@@ -1,26 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event.service';
 import { UserService } from '../../../../core/services/user.service';
 import { CategoryService } from '../../../../core/services/category.service';
+import { RegistrationService } from '../../../../core/services/registration.service';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <div class="space-y-6">
       <!-- Header -->
-      <div>
+      <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
         <p class="text-gray-600">Overview of your event management system</p>
       </div>
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white rounded-xl shadow p-6">
+        <a [routerLink]="['/admin/events']" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow cursor-pointer group">
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-blue-100">
+            <div class="p-3 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
               <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
@@ -30,11 +32,11 @@ import { CategoryService } from '../../../../core/services/category.service';
               <p class="text-2xl font-semibold text-gray-900">{{ stats.totalEvents }}</p>
             </div>
           </div>
-        </div>
+        </a>
 
-        <div class="bg-white rounded-xl shadow p-6">
+        <a [routerLink]="['/admin/users']" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow cursor-pointer group">
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-green-100">
+            <div class="p-3 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
               <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.67 3.623a10.953 10.953 0 01-1.667-1.19m0 0a4.5 4.5 0 01-6.667 0M21 14a2 2 0 01-2 2m-2-2a2 2 0 012-2m0 0a2 2 0 012 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
@@ -44,11 +46,11 @@ import { CategoryService } from '../../../../core/services/category.service';
               <p class="text-2xl font-semibold text-gray-900">{{ stats.totalUsers }}</p>
             </div>
           </div>
-        </div>
+        </a>
 
-        <div class="bg-white rounded-xl shadow p-6">
+        <a [routerLink]="['/admin/registrations']" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow cursor-pointer group">
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-purple-100">
+            <div class="p-3 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
               <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
@@ -58,11 +60,11 @@ import { CategoryService } from '../../../../core/services/category.service';
               <p class="text-2xl font-semibold text-gray-900">{{ stats.totalRegistrations }}</p>
             </div>
           </div>
-        </div>
+        </a>
 
-        <div class="bg-white rounded-xl shadow p-6">
+        <a [routerLink]="['/admin/categories']" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow cursor-pointer group">
           <div class="flex items-center">
-            <div class="p-3 rounded-lg bg-yellow-100">
+            <div class="p-3 rounded-lg bg-yellow-100 group-hover:bg-yellow-200 transition-colors">
               <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
               </svg>
@@ -72,7 +74,7 @@ import { CategoryService } from '../../../../core/services/category.service';
               <p class="text-2xl font-semibold text-gray-900">{{ stats.totalCategories }}</p>
             </div>
           </div>
-        </div>
+        </a>
       </div>
 
       <!-- Recent Activity -->
@@ -140,7 +142,8 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private eventService: EventService,
     private userService: UserService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private registrationService: RegistrationService
   ) {}
 
   ngOnInit() {
@@ -149,22 +152,31 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadStats() {
-    // In a real app, you would have an API endpoint for dashboard stats
-    this.eventService.getEvents().subscribe(response => {
-      if (response.success && response.data) {
-        this.stats.totalEvents = response.data.length;
+    // Get events count - use a large per_page to get total from meta, or use response.meta.total
+    this.eventService.getEvents(1, 1).subscribe(response => {
+      if (response.success) {
+        // Use meta.total if available, otherwise fall back to data length
+        this.stats.totalEvents = (response as any).meta?.total || response.data?.length || 0;
       }
     });
 
     this.userService.getUsers().subscribe(response => {
-      if (response.success && response.data) {
-        this.stats.totalUsers = response.data.length;
+      if (response.success) {
+        // Use meta.total if available, otherwise fall back to data length
+        this.stats.totalUsers = (response as any).meta?.total || response.data?.length || 0;
       }
     });
 
     this.categoryService.getCategories().subscribe(response => {
       if (response.success && response.data) {
         this.stats.totalCategories = response.data.length;
+      }
+    });
+
+    // Get registrations count from admin endpoint
+    this.registrationService.getAllRegistrations(1, 1).subscribe(response => {
+      if (response.success) {
+        this.stats.totalRegistrations = (response as any).meta?.total || response.data?.length || 0;
       }
     });
   }

@@ -37,10 +37,20 @@ import { AuthService } from '../../../../core/services/auth.service';
               <h1 class="text-4xl md:text-5xl font-bold mb-2">{{ event.title }}</h1>
               <p class="text-xl mb-4">{{ event.place }}</p>
               <p class="text-gray-200 mb-6 max-w-2xl">{{ event.description.substring(0, 150) }}...</p>
-              <button (click)="openBookModal()" 
-                      class="w-fit px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                Book now
-              </button>
+              @if (isRegistered) {
+                <button (click)="openUnbookModal()" 
+                        class="w-fit px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Already Booked
+                </button>
+              } @else {
+                <button (click)="openBookModal()" 
+                        class="w-fit px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                  Book now
+                </button>
+              }
             </div>
           </div>
         }
@@ -127,6 +137,28 @@ import { AuthService } from '../../../../core/services/auth.service';
         </div>
       </div>
     }
+
+    <!-- Unbook Event Modal -->
+    @if (showUnbookModal) {
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeUnbookModal()">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Cancel Booking</h2>
+          <div class="space-y-4">
+            <p class="text-gray-600">Are you sure you want to cancel your booking for this event?</p>
+            <div class="flex gap-4 pt-4">
+              <button (click)="closeUnbookModal()" 
+                      class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                Keep Booking
+              </button>
+              <button (click)="unbookEvent()" 
+                      class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                Cancel Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   `,
   imports: [CommonModule, EventCardComponent]
 })
@@ -135,6 +167,8 @@ export class EventDetailComponent implements OnInit {
   otherEvents: Event[] = [];
   isLoading = true;
   showBookModal = false;
+  showUnbookModal = false;
+  isRegistered = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -152,12 +186,31 @@ export class EventDetailComponent implements OnInit {
         if (!isNaN(numericId) && numericId > 0) {
           this.loadEvent(numericId);
           this.loadOtherEvents(numericId);
+          this.checkRegistrationStatus(numericId);
         } else {
           console.error('Invalid event ID:', eventId);
           this.router.navigate(['/']);
         }
       } else {
         this.router.navigate(['/']);
+      }
+    });
+  }
+
+  checkRegistrationStatus(eventId: number) {
+    if (!this.authService.isAuthenticated()) {
+      this.isRegistered = false;
+      return;
+    }
+    
+    this.eventService.checkRegistration(eventId).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.isRegistered = response.data.is_registered;
+        }
+      },
+      error: () => {
+        this.isRegistered = false;
       }
     });
   }
@@ -227,12 +280,21 @@ export class EventDetailComponent implements OnInit {
     this.showBookModal = false;
   }
 
+  openUnbookModal() {
+    this.showUnbookModal = true;
+  }
+
+  closeUnbookModal() {
+    this.showUnbookModal = false;
+  }
+
   bookEvent() {
     if (!this.event) return;
     
     this.registrationService.registerForEvent(this.event.id).subscribe({
       next: (response) => {
         if (response.success) {
+          this.isRegistered = true;
           alert('Successfully booked ' + this.event!.title);
           this.closeBookModal();
         }
@@ -240,6 +302,24 @@ export class EventDetailComponent implements OnInit {
       error: (error) => {
         console.error('Booking error:', error);
         alert('Failed to book event. Please try again.');
+      }
+    });
+  }
+
+  unbookEvent() {
+    if (!this.event) return;
+    
+    this.registrationService.unregisterFromEvent(this.event.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.isRegistered = false;
+          alert('Successfully cancelled your booking for ' + this.event!.title);
+          this.closeUnbookModal();
+        }
+      },
+      error: (error) => {
+        console.error('Unbooking error:', error);
+        alert('Failed to cancel booking. Please try again.');
       }
     });
   }
@@ -261,35 +341,27 @@ export class EventDetailComponent implements OnInit {
 
   getImageUrl(imagePath: string | null): string {
     if (!imagePath) {
-      console.log('EventDetail: No image path provided');
       return '';
     }
     
-    console.log('EventDetail: Original image path:', imagePath);
-    
     // If it's already a full URL, return as is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      console.log('EventDetail: Using full URL:', imagePath);
       return imagePath;
     }
     
     // If it starts with /storage, prepend the backend URL
     if (imagePath.startsWith('/storage') || imagePath.startsWith('storage/')) {
       const cleanPath = imagePath.startsWith('/') ? imagePath : '/' + imagePath;
-      const fullUrl = `http://localhost:8000${cleanPath}`;
-      console.log('EventDetail: Constructed storage URL:', fullUrl);
-      return fullUrl;
+      return `http://localhost:8000${cleanPath}`;
     }
     
     // Otherwise, assume it's a relative path and prepend backend URL
-    const fullUrl = `http://localhost:8000/${imagePath}`;
-    console.log('EventDetail: Constructed relative URL:', fullUrl);
-    return fullUrl;
+    return `http://localhost:8000/${imagePath}`;
   }
 
   onImageError(event: any) {
-    console.error('EventDetail: Image failed to load:', event.target.src);
     // Hide broken image and show placeholder
     event.target.style.display = 'none';
   }
 }
+
