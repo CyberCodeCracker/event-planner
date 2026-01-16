@@ -10,6 +10,7 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 
 // Public Pages
 import { HomeComponent } from './features/public/pages/home/home.component';
+import { EventDetailComponent } from './features/public/pages/event-detail/event-detail.component';
 
 // Auth Pages
 import { LoginComponent } from './features/auth/pages/login/login.component';
@@ -24,6 +25,10 @@ import { ProfileComponent } from './features/profile/pages/profile/profile.compo
 
 // Admin Pages
 import { AdminDashboardComponent } from './features/admin/pages/admin-dashboard/admin-dashboard.component';
+import { ListEventsComponent } from './features/admin/pages/list-events/list-events.component';
+import { ListCategoriesComponent } from './features/admin/pages/list-categories/list-categories.component';
+import { ListRegistrationsComponent } from './features/admin/pages/list-registrations/list-registrations.component';
+import { CreateEventComponent } from './features/admin/pages/create-event/create-event.component';
 
 export const routes: Routes = [
   // Auth Routes
@@ -44,7 +49,7 @@ export const routes: Routes = [
     component: PublicLayoutComponent,
     children: [
       { path: '', component: HomeComponent },
-      { path: 'events/:id', component: HomeComponent }, // Temporary - will show event details
+      { path: 'events/:id', component: EventDetailComponent },
       // Add more public routes here
     ]
   },
@@ -70,7 +75,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard, AdminGuard],
     children: [
       { path: '', component: AdminDashboardComponent },
-      // Add more admin routes here
+      { path: 'events', component: ListEventsComponent },
+      { path: 'events/create', component: CreateEventComponent },
+      { path: 'events/edit/:id', component: CreateEventComponent },
+      { path: 'categories', component: ListCategoriesComponent },
+      { path: 'registrations', component: ListRegistrationsComponent },
+      { path: '**', redirectTo: '' }
     ]
   },
 

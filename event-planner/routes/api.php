@@ -51,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin-only routes
     Route::middleware('admin')->group(function () {
-        // Events (admin CRUD)e
+        // Events (admin CRUD)
         Route::apiResource('events', EventController::class)->except(['index', 'show']);
 
         // Categories (admin CRUD)
@@ -59,5 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Users (admin CRUD - except store/register)
         Route::apiResource('users', UserController::class)->except(['store']);
+
+        // All registrations (admin only)
+        Route::get('/registrations/all', [RegistrationController::class, 'all']);
     });
 });

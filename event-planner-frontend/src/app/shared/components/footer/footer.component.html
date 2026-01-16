@@ -1,46 +1,40 @@
-<footer class="bg-gray-50 border-t mt-auto">
-  <div class="container mx-auto px-4 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
-      <!-- Logo -->
-      <div>
-        <h2 class="text-2xl font-bold text-blue-600">Event Planner</h2>
-      </div>
+<footer class="bg-purple-900 text-white mt-auto">
+  <div class="container mx-auto px-4 py-12">
+    <!-- Logo and Subscription -->
+    <div class="flex flex-col items-center mb-8">
+      <h2 class="text-3xl font-bold mb-6">
+        Event <span class="text-purple-400">Planner</span>
+      </h2>
       
-      <!-- Quick Links -->
-      <div class="flex flex-wrap justify-center gap-6">
-        <a [routerLink]="['/']" class="text-gray-600 hover:text-blue-600 transition-colors">
-          Home
-        </a>
-        <a [routerLink]="['/dashboard']" class="text-gray-600 hover:text-blue-600 transition-colors">
-          Dashboard
-        </a>
-      </div>
-      
-      <!-- Newsletter Subscription -->
-      <div class="w-full md:w-auto">
-        <div class="flex flex-col md:flex-row items-center gap-4">
-          <div class="text-center md:text-left">
-            <h3 class="font-semibold text-gray-900 mb-2">Stay Updated</h3>
-            <p class="text-sm text-gray-600">Subscribe to our newsletter for the latest events</p>
-          </div>
-          <div class="flex">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              class="px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full md:w-auto"
-            >
-            <button class="px-6 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
-              Subscribe
-            </button>
-          </div>
-        </div>
+      <!-- Subscription Form -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md">
+        <input 
+          type="email" 
+          placeholder="Enter your mail" 
+          class="flex-1 px-4 py-3 border border-purple-700 bg-purple-800 text-white placeholder-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+        >
+        <button class="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium whitespace-nowrap">
+          Subscribe
+        </button>
       </div>
     </div>
     
+    <!-- Navigation Links -->
+    <div class="flex justify-center gap-6 mb-8">
+      <a [routerLink]="['/']" class="text-white hover:text-purple-300 transition-colors">
+        Home
+      </a>
+      <a [routerLink]="['/auth/register']" class="text-white hover:text-purple-300 transition-colors">
+        Sign UP
+      </a>
+      <a [routerLink]="['/auth/login']" class="text-white hover:text-purple-300 transition-colors">
+        Sign in
+      </a>
+    </div>
+    
     <!-- Copyright -->
-    <div class="mt-8 pt-8 border-t border-gray-200 text-center text-gray-600">
-      <p>&copy; {{ currentYear }} Event Planner. All rights reserved.</p>
-      <p class="text-sm mt-1">Built with Angular 19 & Laravel Sanctum</p>
+    <div class="text-center text-purple-300 text-sm">
+      <p>Non Copyrighted © {{ currentYear }} Event Planner</p>
     </div>
   </div>
 </footer>

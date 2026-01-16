@@ -9,72 +9,58 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
     <div class="min-h-screen bg-gray-50">
-      <!-- Top Navigation -->
-      <nav class="bg-gray-900 text-white">
-        <div class="px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between h-16">
-            <div class="flex items-center">
-              <!-- Logo -->
-              <div class="flex-shrink-0">
-                <h1 class="text-xl font-bold">Admin Panel</h1>
-              </div>
+      <!-- Header matching design -->
+      <header class="bg-white shadow-sm border-b border-gray-200">
+        <nav class="container mx-auto px-4">
+          <div class="flex justify-between items-center py-4">
+            <!-- Logo -->
+            <div class="flex items-center space-x-8">
+              <a [routerLink]="['/']" class="text-2xl font-bold">
+                Event <span class="text-purple-600">Planner</span>
+              </a>
               
-              <!-- Admin Navigation -->
-              <div class="hidden md:block ml-10">
-                <div class="flex items-baseline space-x-4">
-                  <a [routerLink]="['/admin/dashboard']" 
-                     [routerLinkActive]="['bg-gray-800', 'text-white']"
-                     class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
-                    Dashboard
-                  </a>
-                  <a [routerLink]="['/admin/events']" 
-                     [routerLinkActive]="['bg-gray-800', 'text-white']"
-                     class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
-                    Events
-                  </a>
-                  <a [routerLink]="['/admin/categories']" 
-                     [routerLinkActive]="['bg-gray-800', 'text-white']"
-                     class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
-                    Categories
-                  </a>
-                  <a [routerLink]="['/admin/users']" 
-                     [routerLinkActive]="['bg-gray-800', 'text-white']"
-                     class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
-                    Users
-                  </a>
-                  <a [routerLink]="['/admin/registrations']" 
-                     [routerLinkActive]="['bg-gray-800', 'text-white']"
-                     class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
-                    Registrations
-                  </a>
-                </div>
+              <!-- Navigation Links -->
+              <div class="hidden md:flex items-center space-x-6">
+                <a [routerLink]="['/admin/categories']" 
+                   [routerLinkActive]="['text-purple-600', 'font-semibold']"
+                   [routerLinkActiveOptions]="{exact: false}"
+                   class="text-gray-600 hover:text-purple-600 transition-colors relative">
+                  Categories
+                  @if (router.url.includes('/admin/categories')) {
+                    <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></span>
+                  }
+                </a>
+                <a [routerLink]="['/admin/events']" 
+                   [routerLinkActive]="['text-purple-600', 'font-semibold']"
+                   [routerLinkActiveOptions]="{exact: false}"
+                   class="text-gray-600 hover:text-purple-600 transition-colors relative">
+                  Events
+                  @if (router.url.includes('/admin/events')) {
+                    <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></span>
+                  }
+                </a>
               </div>
             </div>
-            
-            <!-- User Menu -->
-            <div class="flex items-center">
-              <div class="ml-3 relative">
-                <div class="flex items-center space-x-3">
-                  <div class="text-right">
-                    <p class="text-sm font-medium text-white">{{ user?.name }}</p>
-                    <p class="text-xs text-gray-300">Administrator</p>
-                  </div>
-                  <button (click)="logout()" 
-                          class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium">
-                    Logout
-                  </button>
+
+            <!-- User Profile -->
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span class="text-purple-600 font-semibold text-sm">{{ getUserInitials() }}</span>
+                </div>
+                <div class="hidden md:block text-left">
+                  <p class="font-medium text-gray-900">{{ user?.name }}</p>
+                  <p class="text-sm text-gray-500">{{ user?.email }}</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
       <!-- Main Content -->
-      <main>
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <router-outlet></router-outlet>
-        </div>
+      <main class="bg-gray-50">
+        <router-outlet></router-outlet>
       </main>
     </div>
   `
@@ -83,8 +69,8 @@ export class AdminLayoutComponent implements OnInit {
   user: any = null;
 
   constructor(
-    private authService: AuthService,
-    private router: Router
+    public authService: AuthService,
+    public router: Router
   ) {}
 
   ngOnInit() {
@@ -93,7 +79,13 @@ export class AdminLayoutComponent implements OnInit {
     });
   }
 
-  logout() {
-    this.authService.logout().subscribe();
+  getUserInitials(): string {
+    if (!this.user?.name) return 'U';
+    return this.user.name
+      .split(' ')
+      .map((n: string) => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   }
 }

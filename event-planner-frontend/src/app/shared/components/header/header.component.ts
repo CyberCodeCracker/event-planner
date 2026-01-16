@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { User, UserRole } from '../../../core/models/user.model';
 
@@ -7,7 +7,7 @@ import { User, UserRole } from '../../../core/models/user.model';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [RouterLink]
+  imports: [RouterLink, RouterLinkActive]
 })
 export class HeaderComponent implements OnInit {
   currentUser: User | null = null;
@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private router: Router
+    public router: Router
   ) {}
 
   ngOnInit() {

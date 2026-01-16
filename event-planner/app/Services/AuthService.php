@@ -60,8 +60,9 @@ class AuthService
                 return false;
             }
             
-            // Delete the current access token using Sanctum's built-in method
-            $user->currentAccessToken()?->delete();
+            // Delete all tokens for the user (more reliable than currentAccessToken)
+            // This ensures all tokens are revoked
+            $user->tokens()->delete();
             
             return true;
             

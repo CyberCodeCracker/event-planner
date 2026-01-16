@@ -1,20 +1,3 @@
-<div class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50">
-  <!-- Skip header for auth pages -->
-  <main class="flex-grow flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-      <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Event Planner</h1>
-        <p class="mt-2 text-gray-600">Manage and discover amazing events</p>
-      </div>
-      
-      <div class="bg-white rounded-2xl shadow-lg p-8">
-        <router-outlet></router-outlet>
-      </div>
-      
-      <!-- Copyright -->
-      <div class="mt-8 text-center text-gray-600 text-sm">
-        <p>&copy; {{ currentYear }} Event Planner. All rights reserved.</p>
-      </div>
-    </div>
-  </main>
+<div class="min-h-screen flex">
+  <router-outlet></router-outlet>
 </div>

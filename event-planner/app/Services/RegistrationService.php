@@ -59,6 +59,22 @@ class RegistrationService
         return $registrations;
     }
 
+    public function getAllRegistrations(array $filters = []): LengthAwarePaginator
+    {
+        $perPage = $filters['per_page'] ?? 15;
+        $registrations = $this->registrationRepository
+            ->with(['event', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+
+        // Transform to DTOs
+        $registrations->getCollection()->transform(function ($registration) {
+            return RegistrationDTO::fromModel($registration);
+        });
+
+        return $registrations;
+    }
+
     public function unregisterById(int $registrationId): bool
     {
         return $this->registrationRepository->delete($registrationId);

@@ -45,4 +45,13 @@ export class RegistrationService {
     const numericId = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
     return this.apiService.post<any>(`events/${numericId}/register`, {});
   }
+
+  // Get all registrations (admin only)
+  getAllRegistrations(page: number = 1, perPage: number = 100): Observable<ApiResponse<Registration[]>> {
+    const params = {
+      page: page.toString(),
+      per_page: perPage.toString()
+    };
+    return this.apiService.get<Registration[]>('registrations/all', params);
+  }
 }

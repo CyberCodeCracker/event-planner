@@ -3,31 +3,30 @@
     <div class="flex justify-between items-center py-4">
       <!-- Logo -->
       <div class="flex items-center space-x-8">
-        <a [routerLink]="['/']" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
-          Event Planner
+        <a [routerLink]="['/']" class="text-2xl font-bold">
+          Event <span class="text-purple-600">Planner</span>
         </a>
         
         <!-- Navigation Links -->
         <div class="hidden md:flex items-center space-x-6">
-          <a [routerLink]="['/']" 
-             routerLinkActive="text-blue-600 font-semibold"
-             class="text-gray-600 hover:text-blue-600 transition-colors">
-            Home
-          </a>
-          @if (currentUser) {
-            <a [routerLink]="['/dashboard']" 
-               routerLinkActive="text-blue-600 font-semibold"
-               class="text-gray-600 hover:text-blue-600 transition-colors">
-              Dashboard
-            </a>
-          }
-          
-          <!-- Admin Links -->
           @if (isAdmin) {
-            <a [routerLink]="['/admin']" 
-               routerLinkActive="text-blue-600 font-semibold"
-               class="text-gray-600 hover:text-blue-600 transition-colors">
-              Admin
+            <a [routerLink]="['/admin/categories']" 
+               routerLinkActive="text-purple-600 font-semibold"
+               [routerLinkActiveOptions]="{exact: false}"
+               class="text-gray-600 hover:text-purple-600 transition-colors relative">
+              Categories
+              @if (router.url.includes('/admin/categories')) {
+                <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></span>
+              }
+            </a>
+            <a [routerLink]="['/admin/events']" 
+               routerLinkActive="text-purple-600 font-semibold"
+               [routerLinkActiveOptions]="{exact: false}"
+               class="text-gray-600 hover:text-purple-600 transition-colors relative">
+              Events
+              @if (router.url.includes('/admin/events')) {
+                <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"></span>
+              }
             </a>
           }
         </div>
@@ -48,14 +47,14 @@
           <div class="relative group">
             <button class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
               <!-- User Avatar -->
-              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span class="text-blue-600 font-semibold text-sm">{{ userInitials }}</span>
+              <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <span class="text-purple-600 font-semibold text-sm">{{ userInitials }}</span>
               </div>
               
               <!-- User Info -->
               <div class="hidden md:block text-left">
                 <p class="font-medium text-gray-900">{{ currentUser?.name }}</p>
-                <p class="text-sm text-gray-500">{{ currentUser?.role_label }}</p>
+                <p class="text-sm text-gray-500">{{ currentUser?.email }}</p>
               </div>
               
               <!-- Dropdown Icon -->

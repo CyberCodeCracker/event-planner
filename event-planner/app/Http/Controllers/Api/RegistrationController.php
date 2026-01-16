@@ -182,4 +182,30 @@ class RegistrationController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Get all registrations (admin only)
+     */
+    public function all(Request $request): JsonResponse
+    {
+        if (!$request->user()->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $registrations = $this->registrationService->getAllRegistrations($request->all());
+
+        return response()->json([
+            'success' => true,
+            'data' => $registrations->items(),
+            'meta' => [
+                'current_page' => $registrations->currentPage(),
+                'last_page' => $registrations->lastPage(),
+                'per_page' => $registrations->perPage(),
+                'total' => $registrations->total(),
+            ]
+        ]);
+    }
 }
