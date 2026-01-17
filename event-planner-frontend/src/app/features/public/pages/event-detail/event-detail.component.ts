@@ -14,153 +14,226 @@ import { AuthService } from '../../../../core/services/auth.service';
     <div class="min-h-screen bg-gray-50">
       <!-- Back Button and Banner Section -->
       <div class="relative">
-        <button (click)="goBack()" 
-                class="absolute top-4 left-4 z-10 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        <button
+          (click)="goBack()"
+          class="absolute top-4 left-4 z-10 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            ></path>
           </svg>
           Back
         </button>
-        
+
         @if (event) {
-          <div class="relative h-[400px] overflow-hidden">
-            @if (event.image) {
-              <img [src]="getImageUrl(event.image)" 
-                   [alt]="event.title" 
-                   class="w-full h-full object-cover"
-                   (error)="onImageError($event)">
+        <div class="relative h-[400px] overflow-hidden">
+          @if (event.image) {
+          <img
+            [src]="getImageUrl(event.image)"
+            [alt]="event.title"
+            class="w-full h-full object-cover"
+            (error)="onImageError($event)"
+          />
+          } @else {
+          <div
+            class="w-full h-full bg-gradient-to-r from-purple-500 to-indigo-600"
+          ></div>
+          }
+          <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div
+            class="absolute inset-0 flex flex-col justify-end p-8 text-white"
+          >
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">
+              {{ event.title }}
+            </h1>
+            <p class="text-xl mb-4">{{ event.place }}</p>
+            <p class="text-gray-200 mb-6 max-w-2xl">
+              {{ event.description.substring(0, 150) }}...
+            </p>
+            @if (isRegistered) {
+            <button
+              (click)="openUnbookModal()"
+              class="w-fit px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+              Already Booked
+            </button>
+            } @else if(event.available_spots == 0) {
+            <span
+              class="w-fit px-8 py-3 bg-purple-600 text-gray-400 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+              >Unavailable</span
+            >
             } @else {
-              <div class="w-full h-full bg-gradient-to-r from-purple-500 to-indigo-600"></div>
+            <button
+              (click)="openBookModal()"
+              class="w-fit px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              Book now
+            </button>
             }
-            <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-            <div class="absolute inset-0 flex flex-col justify-end p-8 text-white">
-              <h1 class="text-4xl md:text-5xl font-bold mb-2">{{ event.title }}</h1>
-              <p class="text-xl mb-4">{{ event.place }}</p>
-              <p class="text-gray-200 mb-6 max-w-2xl">{{ event.description.substring(0, 150) }}...</p>
-              @if (isRegistered) {
-                <button (click)="openUnbookModal()" 
-                        class="w-fit px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  Already Booked
-                </button>
-              } @else {
-                <button (click)="openBookModal()" 
-                        class="w-fit px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                  Book now
-                </button>
-              }
-            </div>
           </div>
+        </div>
         }
       </div>
 
       @if (event) {
-        <div class="container mx-auto px-4 py-12">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column - Description -->
-            <div class="lg:col-span-2">
-              <div class="bg-white rounded-xl shadow-md p-8 mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Description</h2>
-                <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ event.description }}</p>
-              </div>
+      <div class="container mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Left Column - Description -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">Description</h2>
+              <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                {{ event.description }}
+              </p>
             </div>
+          </div>
 
-            <!-- Right Column - Hours & Capacity -->
-            <div class="space-y-6">
-              <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Hours</h3>
-                <div class="space-y-3">
-                  <div>
-                    <p class="text-gray-600">Weekdays hour:</p>
-                    <p class="text-purple-600 font-semibold">{{ getWeekdayHours() }}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-600">Sunday hour:</p>
-                    <p class="text-purple-600 font-semibold">{{ getSundayHours() }}</p>
-                  </div>
+          <!-- Right Column - Hours & Capacity -->
+          <div class="space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-4">Hours</h3>
+              <div class="space-y-3">
+                <div>
+                  <p class="text-gray-600">Weekdays hour:</p>
+                  <p class="text-purple-600 font-semibold">
+                    {{ getWeekdayHours() }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-gray-600">Sunday hour:</p>
+                  <p class="text-purple-600 font-semibold">
+                    {{ getSundayHours() }}
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Capacity</h3>
-                <p class="text-gray-600">Seats number:</p>
-                <p class="text-purple-600 font-semibold text-2xl">{{ event.capacity }} persons</p>
-              </div>
+            <div class="bg-white rounded-xl shadow-md p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-4">Capacity</h3>
+              <p class="text-gray-600">Seats number:</p>
+              <p class="text-purple-600 font-semibold text-2xl">
+                {{ event.capacity }} persons
+              </p>
             </div>
           </div>
+        </div>
 
-          <!-- Other Events Section -->
-          <div class="mt-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8">Other events you may like</h2>
-            @if (otherEvents.length > 0) {
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @for (otherEvent of otherEvents; track otherEvent.id) {
-                  <app-event-card 
-                    [event]="otherEvent"
-                    (viewDetails)="onViewDetails($event)"
-                    (register)="onRegister($event)"
-                  ></app-event-card>
-                }
-              </div>
+        <!-- Other Events Section -->
+        <div class="mt-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">
+            Other events you may like
+          </h2>
+          @if (otherEvents.length > 0) {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (otherEvent of otherEvents; track otherEvent.id) {
+            <app-event-card
+              [event]="otherEvent"
+              (viewDetails)="onViewDetails($event)"
+              (register)="onRegister($event)"
+            ></app-event-card>
             }
           </div>
+          }
         </div>
-      }
-
-      @if (isLoading) {
-        <div class="text-center py-12">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
-        </div>
+      </div>
+      } @if (isLoading) {
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"
+        ></div>
+      </div>
       }
     </div>
 
     <!-- Book Event Modal -->
     @if (showBookModal) {
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeBookModal()">
-        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Book Event</h2>
-          <div class="space-y-4">
-            <p class="text-gray-600">Are you sure you want to book this event?</p>
-            <div class="flex gap-4 pt-4">
-              <button (click)="closeBookModal()" 
-                      class="flex-1 px-6 py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium">
-                Cancel
-              </button>
-              <button (click)="bookEvent()" 
-                      class="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
-                Book now
-              </button>
-            </div>
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      (click)="closeBookModal()"
+    >
+      <div
+        class="bg-white rounded-xl p-8 max-w-md w-full mx-4"
+        (click)="$event.stopPropagation()"
+      >
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Book Event</h2>
+        <div class="space-y-4">
+          <p class="text-gray-600">Are you sure you want to book this event?</p>
+          <div class="flex gap-4 pt-4">
+            <button
+              (click)="closeBookModal()"
+              class="flex-1 px-6 py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="bookEvent()"
+              class="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              Book now
+            </button>
           </div>
         </div>
       </div>
+    </div>
     }
 
     <!-- Unbook Event Modal -->
     @if (showUnbookModal) {
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeUnbookModal()">
-        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Cancel Booking</h2>
-          <div class="space-y-4">
-            <p class="text-gray-600">Are you sure you want to cancel your booking for this event?</p>
-            <div class="flex gap-4 pt-4">
-              <button (click)="closeUnbookModal()" 
-                      class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                Keep Booking
-              </button>
-              <button (click)="unbookEvent()" 
-                      class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                Cancel Booking
-              </button>
-            </div>
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      (click)="closeUnbookModal()"
+    >
+      <div
+        class="bg-white rounded-xl p-8 max-w-md w-full mx-4"
+        (click)="$event.stopPropagation()"
+      >
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Cancel Booking</h2>
+        <div class="space-y-4">
+          <p class="text-gray-600">
+            Are you sure you want to cancel your booking for this event?
+          </p>
+          <div class="flex gap-4 pt-4">
+            <button
+              (click)="closeUnbookModal()"
+              class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            >
+              Keep Booking
+            </button>
+            <button
+              (click)="unbookEvent()"
+              class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              Cancel Booking
+            </button>
           </div>
         </div>
       </div>
+    </div>
     }
   `,
-  imports: [CommonModule, EventCardComponent]
+  imports: [CommonModule, EventCardComponent],
 })
 export class EventDetailComponent implements OnInit {
   event: Event | null = null;
@@ -179,7 +252,7 @@ export class EventDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const eventId = params.get('id');
       if (eventId) {
         const numericId = parseInt(eventId, 10);
@@ -202,7 +275,7 @@ export class EventDetailComponent implements OnInit {
       this.isRegistered = false;
       return;
     }
-    
+
     this.eventService.checkRegistration(eventId).subscribe({
       next: (response) => {
         if (response.success && response.data) {
@@ -211,7 +284,7 @@ export class EventDetailComponent implements OnInit {
       },
       error: () => {
         this.isRegistered = false;
-      }
+      },
     });
   }
 
@@ -232,7 +305,7 @@ export class EventDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error loading event:', error);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -240,9 +313,11 @@ export class EventDetailComponent implements OnInit {
     this.eventService.getUpcomingEvents().subscribe({
       next: (response) => {
         if (response.data) {
-          this.otherEvents = response.data.filter(e => e.id !== currentEventId).slice(0, 6);
+          this.otherEvents = response.data
+            .filter((e) => e.id !== currentEventId)
+            .slice(0, 6);
         }
-      }
+      },
     });
   }
 
@@ -261,7 +336,13 @@ export class EventDetailComponent implements OnInit {
   }
 
   formatTime(date: Date): string {
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
+    return date
+      .toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+      .toUpperCase();
   }
 
   goBack() {
@@ -270,7 +351,9 @@ export class EventDetailComponent implements OnInit {
 
   openBookModal() {
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: this.router.url } });
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: this.router.url },
+      });
       return;
     }
     this.showBookModal = true;
@@ -290,7 +373,7 @@ export class EventDetailComponent implements OnInit {
 
   bookEvent() {
     if (!this.event) return;
-    
+
     this.registrationService.registerForEvent(this.event.id).subscribe({
       next: (response) => {
         if (response.success) {
@@ -302,13 +385,13 @@ export class EventDetailComponent implements OnInit {
       error: (error) => {
         console.error('Booking error:', error);
         alert('Failed to book event. Please try again.');
-      }
+      },
     });
   }
 
   unbookEvent() {
     if (!this.event) return;
-    
+
     this.registrationService.unregisterFromEvent(this.event.id).subscribe({
       next: (response) => {
         if (response.success) {
@@ -320,7 +403,7 @@ export class EventDetailComponent implements OnInit {
       error: (error) => {
         console.error('Unbooking error:', error);
         alert('Failed to cancel booking. Please try again.');
-      }
+      },
     });
   }
 
@@ -330,7 +413,9 @@ export class EventDetailComponent implements OnInit {
 
   onRegister(event: Event) {
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/' } });
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: '/' },
+      });
       return;
     }
 
@@ -343,18 +428,18 @@ export class EventDetailComponent implements OnInit {
     if (!imagePath) {
       return '';
     }
-    
+
     // If it's already a full URL, return as is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    
+
     // If it starts with /storage, prepend the backend URL
     if (imagePath.startsWith('/storage') || imagePath.startsWith('storage/')) {
       const cleanPath = imagePath.startsWith('/') ? imagePath : '/' + imagePath;
       return `http://localhost:8000${cleanPath}`;
     }
-    
+
     // Otherwise, assume it's a relative path and prepend backend URL
     return `http://localhost:8000/${imagePath}`;
   }
@@ -364,4 +449,3 @@ export class EventDetailComponent implements OnInit {
     event.target.style.display = 'none';
   }
 }
-

@@ -10,10 +10,10 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="min-h-screen w-screen flex overflow-x-hidden overflow-y-auto">
+    <div class="h-screen w-full flex overflow-hidden">
       <!-- Left Side - Welcome Section -->
-      <div class="hidden lg:flex lg:w-3/5 bg-cover bg-center relative flex-shrink-0" 
-           style="background-image: url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80');">
+      <div class="hidden lg:flex lg:w-2/5 bg-cover bg-center relative flex-shrink-0" 
+           style="background-image: url('/assets/images/register.jpg');">
         <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         <div class="relative z-10 flex flex-col justify-center items-center text-white p-8 w-full text-center">
           <h1 class="text-5xl font-bold mb-4">Welcome back</h1>
@@ -26,15 +26,15 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
       </div>
 
       <!-- Right Side - Register Form -->
-      <div class="flex-1 lg:w-2/5 flex items-center justify-center bg-gray-100 p-8 overflow-y-auto min-w-0">
+      <div class="flex-1 lg:w-2/5 flex items-center justify-center bg-gray-100 p-8 overflow-y-auto">
         <div class="w-full max-w-md">
-          <div class="mb-8">
+          <div class="mb-4">
             <h1 class="text-3xl font-bold text-gray-900">
               Event <span class="text-purple-600">Planner</span>
             </h1>
           </div>
           
-          <h2 class="text-3xl font-bold text-gray-900 mb-8">Sign Up to Event Planner</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Sign Up to Event Planner</h2>
 
           @if (errorMessage) {
             <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -47,7 +47,7 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
             </div>
           }
 
-          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">YOUR NAME</label>
               <input
@@ -57,6 +57,16 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
               />
+              @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+                <div class="mt-2 text-sm text-red-600">
+                  @if (registerForm.get('name')?.errors?.['required']) {
+                    <span>Name is required</span>
+                  }
+                  @if (registerForm.get('name')?.errors?.['minlength']) {
+                    <span>Name must be at least 2 characters</span>
+                  }
+                </div>
+              }
             </div>
 
             <div>
@@ -68,6 +78,16 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
               />
+              @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                <div class="mt-2 text-sm text-red-600">
+                  @if (registerForm.get('email')?.errors?.['required']) {
+                    <span>Email is required</span>
+                  }
+                  @if (registerForm.get('email')?.errors?.['email']) {
+                    <span>Please enter a valid email</span>
+                  }
+                </div>
+              }
             </div>
 
             <div>
@@ -79,6 +99,16 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
               />
+              @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                <div class="mt-2 text-sm text-red-600">
+                  @if (registerForm.get('password')?.errors?.['required']) {
+                    <span>Password is required</span>
+                  }
+                  @if (registerForm.get('password')?.errors?.['minlength']) {
+                    <span>Password must be at least 6 characters</span>
+                  }
+                </div>
+              }
             </div>
 
             <div>
@@ -90,6 +120,16 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 transition-colors"
                 [class.border-red-500]="registerForm.get('password_confirmation')?.invalid && registerForm.get('password_confirmation')?.touched"
               />
+              @if (registerForm.get('password_confirmation')?.invalid && registerForm.get('password_confirmation')?.touched) {
+                <div class="mt-2 text-sm text-red-600">
+                  @if (registerForm.get('password_confirmation')?.errors?.['required']) {
+                    <span>Please confirm your password</span>
+                  }
+                  @if (registerForm.get('password_confirmation')?.errors?.['mismatch']) {
+                    <span>Passwords do not match</span>
+                  }
+                </div>
+              }
             </div>
 
             <button
@@ -105,7 +145,7 @@ import { RegisterRequest } from '../../../../core/models/auth.model';
             </button>
           </form>
 
-          <div class="mt-8 text-center text-sm text-gray-600">
+          <div class="mt-4 text-center text-sm text-gray-600">
             Already have an account? 
             <a [routerLink]="['/auth/login']" class="text-purple-600 font-medium hover:text-purple-700">
               Sign In

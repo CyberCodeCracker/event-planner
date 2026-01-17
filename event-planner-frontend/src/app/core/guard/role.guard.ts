@@ -22,7 +22,6 @@ export class RoleGuard implements CanActivate {
     }
 
     if (user.role !== expectedRole) {
-      // Redirect to home or show access denied
       this.router.navigate(['/']);
       return false;
     }
@@ -31,7 +30,6 @@ export class RoleGuard implements CanActivate {
   }
 }
 
-// Alternatively, create an AdminGuard for admin-only routes
 @Injectable({
   providedIn: 'root'
 })

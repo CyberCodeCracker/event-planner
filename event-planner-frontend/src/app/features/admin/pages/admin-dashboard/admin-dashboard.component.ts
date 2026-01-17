@@ -11,7 +11,7 @@ import { RegistrationService } from '../../../../core/services/registration.serv
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="space-y-6">
+    <div class="space-y-6 m-3">
       <!-- Header -->
       <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>

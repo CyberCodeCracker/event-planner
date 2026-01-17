@@ -12,10 +12,10 @@ import { LoginRequest } from '../../../../core/models/auth.model';
 @Component({
   selector: 'app-login',
   template: `
-    <div class="min-h-screen w-screen flex overflow-x-hidden">
+    <div class="h-screen w-full flex overflow-hidden">
       <!-- Left Side - Welcome Section -->
-      <div class="hidden lg:flex lg:w-3/5 bg-cover bg-center relative" 
-           style="background-image: url('https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80');">
+      <div class="hidden lg:flex lg:w-2/5 bg-cover bg-center relative" 
+           style="background-image: url('/assets/images/login.jpg');">
         <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         <div class="relative z-10 flex flex-col justify-center items-center text-white p-8 w-full text-center">
           <h1 class="text-5xl font-bold mb-4">Hello Friend</h1>
@@ -28,15 +28,15 @@ import { LoginRequest } from '../../../../core/models/auth.model';
       </div>
 
       <!-- Right Side - Login Form -->
-      <div class="flex-1 lg:w-2/5 flex items-center justify-center bg-gray-100 p-8">
+      <div class="flex-1 lg:w-2/5 flex items-center justify-center bg-gray-100 p-8 overflow-y-auto">
         <div class="w-full max-w-md">
-          <div class="mb-8">
+          <div class="mb-4">
             <h1 class="text-3xl font-bold text-gray-900">
               Event <span class="text-purple-600">Planner</span>
             </h1>
           </div>
           
-          <h2 class="text-3xl font-bold text-gray-900 mb-8">Sign In to Event Planner</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Sign In to Event Planner</h2>
 
           @if (errorMessage) {
             <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -49,7 +49,7 @@ import { LoginRequest } from '../../../../core/models/auth.model';
             </div>
           }
 
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                 YOUR EMAIL

@@ -43,7 +43,6 @@ class RegistrationController extends Controller
      */
     public function store(Request $request, Event $event): JsonResponse
     {
-        // Check if user can register
         $canRegister = $this->eventService->canRegisterToEvent($request->user(), $event);
         
         if (!$canRegister['can_register']) {
@@ -79,7 +78,6 @@ class RegistrationController extends Controller
     public function destroy(Request $request, int $id): JsonResponse
     {
         try {
-            // Get registration
             $registration = $this->registrationService->getRegistrationById($id);
             
             if (!$registration) {
@@ -89,7 +87,6 @@ class RegistrationController extends Controller
                 ], 404);
             }
             
-            // Check if user owns this registration
             if ($request->user()->id !== $registration->user_id && !$request->user()->isAdmin()) {
                 return response()->json([
                     'success' => false,
@@ -97,7 +94,6 @@ class RegistrationController extends Controller
                 ], 403);
             }
             
-            // Check if event has already started
             $event = Event::find($registration->event_id);
             if ($event && $event->start_date < now()) {
                 return response()->json([

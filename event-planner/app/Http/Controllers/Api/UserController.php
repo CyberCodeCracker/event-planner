@@ -24,7 +24,6 @@ class UserController extends Controller
         if($request->user() === null){
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
-        // Check if user is admin
         if (!$request->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -48,7 +47,6 @@ class UserController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
-        // Admin can view any user, users can only view themselves
         if (!$request->user()->isAdmin() && $request->user()->id !== $id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -91,7 +89,6 @@ class UserController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Prevent admin from deleting themselves
         if ($request->user()->id === $id) {
             return response()->json(['message' => 'Cannot delete your own account'], 400);
         }

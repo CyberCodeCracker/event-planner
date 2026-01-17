@@ -15,9 +15,8 @@ import { AuthService } from '../../../../core/services/auth.service';
   standalone: true,
   template: `
     <div class="min-h-screen bg-white">
-      <!-- Hero Section with Image -->
       <div class="relative h-[500px] overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=1920&q=80" 
+        <img src="/assets/images/welcome.jpg" 
              alt="Event" 
              class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -26,7 +25,6 @@ import { AuthService } from '../../../../core/services/auth.service';
             MADE FOR THOSE WHO DO
           </h1>
         </div>
-        <!-- Navigation Arrows -->
         <button class="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -39,14 +37,12 @@ import { AuthService } from '../../../../core/services/auth.service';
         </button>
       </div>
       
-      <!-- Upcoming Events Section -->
       <div class="container mx-auto px-4 py-12">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <h2 class="text-4xl font-bold text-gray-900 mb-4 md:mb-0">
             Upcoming <span class="text-purple-600">Events</span>
           </h2>
           
-          <!-- Search and Filters -->
           <div class="flex flex-wrap gap-4 items-center">
             <div class="relative">
               <input type="text" 

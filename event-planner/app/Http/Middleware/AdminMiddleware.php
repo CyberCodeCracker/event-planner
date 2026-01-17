@@ -11,13 +11,6 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        Log::info('=== ADMIN MIDDLEWARE HIT ===', [
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'has_user' => $request->user() ? 'yes' : 'no',
-            'user_id' => $request->user()?->id,
-            'is_admin' => $request->user()?->isAdmin(),
-        ]);
 
         // Check if user is authenticated and is admin
         if (!$request->user() || !$request->user()->isAdmin()) {

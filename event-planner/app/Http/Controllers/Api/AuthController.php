@@ -39,14 +39,13 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        // This now returns an array with 'user' and 'token'
         $result = $this->authService->register($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Registration successful',
-            'user' => $result['user']->toArray(),  // Access the user from array
-            'token' => $result['token']             // Include the token
+            'user' => $result['user']->toArray(),  
+            'token' => $result['token']            
         ], 201);
     }
 

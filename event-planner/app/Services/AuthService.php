@@ -54,15 +54,27 @@ class AuthService
     public function logout(): bool
     {
         try {
-            // Get the token from the Authorization header
+            // First try to use the authenticated user's token (preferred method)
+            $user = Auth::user();
+            if ($user && method_exists($user, 'currentAccessToken') && $user->currentAccessToken()) {
+                $user->currentAccessToken()->delete();
+                return true;
+            }
+            
+            // Fallback: Get the token from the Authorization header
             $token = request()->bearerToken();
             
             if (!$token) {
                 return false;
             }
             
+            // Sanctum tokens are formatted as "id|token"
+            // We need to extract just the token part and hash it
+            $tokenParts = explode('|', $token, 2);
+            $tokenValue = count($tokenParts) === 2 ? $tokenParts[1] : $token;
+            
             // Hash the token to match what's in the database
-            $hashedToken = hash('sha256', $token);
+            $hashedToken = hash('sha256', $tokenValue);
             
             // Delete the token from the database
             $deleted = DB::table('personal_access_tokens')
@@ -72,6 +84,7 @@ class AuthService
             return $deleted > 0;
             
         } catch (\Exception $e) {
+            Log::error('Logout failed: ' . $e->getMessage());
             return false;
         }
     }

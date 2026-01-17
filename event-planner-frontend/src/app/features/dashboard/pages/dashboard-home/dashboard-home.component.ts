@@ -95,43 +95,7 @@ import { EventCardComponent } from '../../../../shared/components/event-card/eve
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="bg-white rounded-xl shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <a [routerLink]="['/admin/events/create']" 
-             class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors">
-            <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span class="text-sm font-medium text-gray-700">Create Event</span>
-          </a>
-          
-          <a [routerLink]="['/dashboard/my-registrations']" 
-             class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors">
-            <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span class="text-sm font-medium text-gray-700">My Registrations</span>
-          </a>
-          
-          <a [routerLink]="['/dashboard/my-events']" 
-             class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors">
-            <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-            <span class="text-sm font-medium text-gray-700">My Events</span>
-          </a>
-          
-          <a [routerLink]="['/dashboard/profile']" 
-             class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors">
-            <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-            <span class="text-sm font-medium text-gray-700">Edit Profile</span>
-          </a>
-        </div>
-      </div>
+
     </div>
   `
 })
@@ -152,11 +116,34 @@ export class DashboardHomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadUpcomingEvents();
+    this.loadStats();
+  }
+
+  loadStats() {
+    // Load registration count
+    this.registrationService.getUserRegistrations(1, 1).subscribe({
+      next: (response: any) => {
+        if (response.success && response.meta) {
+          this.stats.totalRegistrations = response.meta.total;
+        }
+      },
+      error: (error) => console.error('Error loading registration stats:', error)
+    });
+
+    // Load total events count
+    this.eventService.getEvents(1, 1).subscribe({
+      next: (response: any) => {
+        if (response.success && response.meta) {
+          this.stats.totalEvents = response.meta.total;
+        }
+      },
+      error: (error) => console.error('Error loading event stats:', error)
+    });
   }
 
   loadUpcomingEvents() {
     this.isLoading = true;
-    this.eventService.getUpcomingEvents().subscribe({
+    this.eventService.getUpcomingEvents(6).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.upcomingEvents = response.data;
@@ -181,7 +168,7 @@ export class DashboardHomeComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           alert('Successfully registered for ' + event.title);
-          // Optionally reload events or update the UI
+          this.loadStats();
         }
       },
       error: (error) => {
